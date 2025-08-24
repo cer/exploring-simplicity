@@ -116,30 +116,30 @@ Implement the Flight Service with basic domain logic and successful booking flow
 
 Using TDD approach:
 
-[ ] Write test for Traveler entity validation
-[ ] Implement Traveler entity with UUID id, name, email
-[ ] Write test for FlightBooking entity
-[ ] Implement FlightBooking entity with all required fields (id, confirmationNumber, travelerId, from, to, departureDate, returnDate, price)
+[x] Write test for Traveler entity validation
+[x] Implement Traveler entity with UUID id, name, email
+[x] Write test for FlightBooking entity
+[x] Implement FlightBooking entity with all required fields (id, confirmationNumber, travelerId, from, to, departureDate, returnDate, price)
 
-[ ] Write test for BookFlightCommand record
-[ ] Implement BookFlightCommand with correlationId and flight details
-[ ] Write test for FlightBookedEvent record
-[ ] Implement FlightBookedEvent with booking details
+[x] Write test for BookFlightCommand record
+[x] Implement BookFlightCommand with correlationId and flight details
+[x] Write test for FlightBookedEvent record
+[x] Implement FlightBookedEvent with booking details
 
-[ ] Write test for FlightBookingService.bookFlight() success case
-[ ] Implement FlightBooking repository (JPA)
-[ ] Implement FlightBookingService with booking logic
-[ ] Generate confirmation number in service
+[x] Write test for FlightBookingService.bookFlight() success case
+[x] Implement FlightBooking repository (JPA)
+[x] Implement FlightBookingService with booking logic
+[x] Generate confirmation number in service
 
-[ ] Write test for FlightCommandHandler Kafka listener
-[ ] Implement FlightCommandHandler with @KafkaListener
-[ ] Write test for successful booking command processing
-[ ] Implement command processing and event publishing
+[x] Write test for FlightCommandHandler Kafka listener
+[x] Implement FlightCommandHandler with @KafkaListener
+[x] Write test for successful booking command processing
+[x] Implement command processing and event publishing
 
-[ ] Create database migration script (schema.sql)
-[ ] Configure application.yml with Kafka and database settings
-[ ] Write integration test for happy path
-[ ] Verify service starts and processes successful bookings
+[x] Create database migration script (schema.sql)
+[x] Configure application.yml with Kafka and database settings
+[x] Write integration test for happy path
+[x] Verify service starts and processes successful bookings
 
 The service should:
 - Listen on flight-service-commands topic

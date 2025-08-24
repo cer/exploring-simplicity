@@ -1,3 +1,5 @@
+apply plugin: 'IntegrationTestsPlugin'
+
 dependencies {
     implementation project(':common')
 }
