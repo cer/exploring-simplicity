@@ -37,6 +37,7 @@ subprojects {
         testImplementation 'org.testcontainers:kafka'
         testImplementation 'org.testcontainers:postgresql'
         testImplementation 'org.testcontainers:junit-jupiter'
+        testImplementation 'org.awaitility:awaitility'
     }
     
     test {
