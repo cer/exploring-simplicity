@@ -20,19 +20,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
     steps:
     - uses: actions/checkout@v4
 
@@ -41,19 +28,15 @@ jobs:
       with:
         java-version: '21'
         distribution: 'temurin'
-        cache: gradle
 
-    - name: Grant execute permission for gradlew
-      working-directory: travel-booking-spring-kafka
-      run: chmod +x gradlew
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-read-only: false
 
     - name: Build with Gradle
       working-directory: travel-booking-spring-kafka
-      run: ./gradlew clean build
-
-    - name: Run tests
-      working-directory: travel-booking-spring-kafka
-      run: ./gradlew test
+      run: ./gradlew build --build-cache --no-daemon
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
@@ -62,12 +45,12 @@ jobs:
         name: test-results
         path: travel-booking-spring-kafka/**/build/test-results/test/TEST-*.xml
 
-    - name: Build Docker images
+    - name: Verify Docker Compose
       working-directory: travel-booking-spring-kafka
       run: |
         ./gradlew bootJar
-        for service in trip-booking-service flight-service hotel-service car-rental-service discount-service; do
-          if [ -f $service/Dockerfile ]; then
-            docker build -t travel-booking/$service:latest $service/
-          fi
-        done
+        docker compose up --wait --wait-timeout 120
+        
+        docker compose ps
+  
+        docker compose down
