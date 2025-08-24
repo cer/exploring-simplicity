@@ -159,29 +159,29 @@ Implement the Hotel Service with basic domain logic and successful reservation f
 
 Using TDD approach:
 
-[ ] Write test for HotelReservation entity
-[ ] Implement HotelReservation entity with all required fields (id, confirmationNumber, travelerId, hotelName, checkInDate, checkOutDate, totalPrice)
+[x] Write test for HotelReservation entity
+[x] Implement HotelReservation entity with all required fields (id, confirmationNumber, travelerId, hotelName, checkInDate, checkOutDate, totalPrice)
 
-[ ] Write test for ReserveHotelCommand record
-[ ] Implement ReserveHotelCommand with correlationId and hotel details
-[ ] Write test for HotelReservedEvent record
-[ ] Implement HotelReservedEvent with reservation details
+[x] Write test for ReserveHotelCommand record
+[x] Implement ReserveHotelCommand with correlationId and hotel details
+[x] Write test for HotelReservedEvent record
+[x] Implement HotelReservedEvent with reservation details
 
-[ ] Write test for HotelReservationService.reserveHotel() success case
-[ ] Implement HotelReservation repository (JPA)
-[ ] Implement HotelReservationService with reservation logic
-[ ] Calculate total price based on nights stayed
-[ ] Generate confirmation number
+[x] Write test for HotelReservationService.reserveHotel() success case
+[x] Implement HotelReservation repository (JPA)
+[x] Implement HotelReservationService with reservation logic
+[x] Calculate total price based on nights stayed
+[x] Generate confirmation number
 
-[ ] Write test for HotelCommandHandler Kafka listener
-[ ] Implement HotelCommandHandler with @KafkaListener
-[ ] Write test for successful reservation command processing
-[ ] Implement command processing and event publishing
+[x] Write test for HotelCommandHandler Kafka listener
+[x] Implement HotelCommandHandler with @KafkaListener
+[x] Write test for successful reservation command processing
+[x] Implement command processing and event publishing
 
-[ ] Create database migration script
-[ ] Configure application.yml
-[ ] Write integration test for happy path
-[ ] Verify service starts and processes successful reservations
+[x] Create database migration script
+[x] Configure application.yml
+[x] Write integration test for happy path
+[x] Verify service starts and processes successful reservations
 
 The service should:
 - Listen on hotel-service-commands topic
