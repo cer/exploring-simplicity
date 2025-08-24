@@ -159,40 +159,40 @@ Implement hotel reservation capability parallel to flight booking.
 ```text
 Implement HotelReservation entity and HotelReservationService following TDD:
 
-[ ] Write test for HotelRequest DTO
-    [ ] Create HotelRequestTest
-    [ ] Test validation for required fields (location, checkIn, checkOut)
-    [ ] Run test (expect failure)
+[x] Write test for HotelRequest DTO
+    [x] Create HotelRequestTest
+    [x] Test validation for required fields (location, checkIn, checkOut)
+    [x] Run test (expect failure)
 
-[ ] Implement HotelRequest DTO
-    [ ] Create HotelRequest as Java record with validation
-    [ ] Validate check-out is after check-in
-    [ ] Run test and make it pass
+[x] Implement HotelRequest DTO
+    [x] Create HotelRequest as Java record with validation
+    [x] Validate check-out is after check-in
+    [x] Run test and make it pass
 
-[ ] Write test for HotelReservation entity
-    [ ] Create HotelReservationTest
-    [ ] Test entity with all fields
-    [ ] Test relationship with Traveler
-    [ ] Run test (expect failure)
+[x] Write test for HotelReservation entity
+    [x] Create HotelReservationTest
+    [x] Test entity with all fields
+    [x] Test relationship with Traveler
+    [x] Run test (expect failure)
 
-[ ] Implement HotelReservation entity
-    [ ] Create HotelReservation with @Entity
-    [ ] Fields: id, confirmationNumber, hotel details, traveler
-    [ ] Run test and make it pass
+[x] Implement HotelReservation entity
+    [x] Create HotelReservation with @Entity
+    [x] Fields: id, confirmationNumber, hotel details, traveler
+    [x] Run test and make it pass
 
-[ ] Write test for HotelReservationService
-    [ ] Create HotelReservationServiceTest
-    [ ] Test reserveHotel method
-    [ ] Test unavailable hotel scenario
-    [ ] Run test (expect failure)
+[x] Write test for HotelReservationService
+    [x] Create HotelReservationServiceTest
+    [x] Test reserveHotel method
+    [x] Test unavailable hotel scenario
+    [x] Run test (expect failure)
 
-[ ] Implement HotelReservationService
-    [ ] Create service with reserveHotel method
-    [ ] Add availability logic
-    [ ] Throw HotelReservationException when unavailable
-    [ ] Run test and make it pass
+[x] Implement HotelReservationService
+    [x] Create service with reserveHotel method
+    [x] Add availability logic
+    [x] Throw exception when unavailable (using IllegalStateException)
+    [x] Run test and make it pass
 
-[ ] Run all tests and commit when passing
+[x] Run all tests and commit when passing
 ```
 
 ---
