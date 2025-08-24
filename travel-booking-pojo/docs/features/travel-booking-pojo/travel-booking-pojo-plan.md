@@ -246,42 +246,42 @@ Implement optional car rental with discount application.
 ```text
 Implement CarRental entity and CarRentalService following TDD:
 
-[ ] Write test for CarRentalRequest DTO
-    [ ] Create CarRentalRequestTest
-    [ ] Test validation for pickup/dropoff locations and dates
-    [ ] Run test (expect failure)
+[x] Write test for CarRentalRequest DTO
+    [x] Create CarRentalRequestTest
+    [x] Test validation for pickup/dropoff locations and dates
+    [x] Run test (expect failure)
 
-[ ] Implement CarRentalRequest DTO
-    [ ] Create CarRentalRequest as Java record with validation
-    [ ] Fields: pickupLocation, dropoffLocation, dates, carType
-    [ ] Run test and make it pass
+[x] Implement CarRentalRequest DTO
+    [x] Create CarRentalRequest as Java record with validation
+    [x] Fields: pickupLocation, dropoffLocation, dates, carType
+    [x] Run test and make it pass
 
-[ ] Write test for CarRental entity
-    [ ] Create CarRentalTest
-    [ ] Test entity with and without discount
-    [ ] Calculate final price with discount
-    [ ] Run test (expect failure)
+[x] Write test for CarRental entity
+    [x] Create CarRentalTest
+    [x] Test entity with and without discount
+    [x] Calculate final price with discount
+    [x] Run test (expect failure)
 
-[ ] Implement CarRental entity
-    [ ] Create CarRental with @Entity
-    [ ] Fields: id, confirmationNumber, rental details, appliedDiscount
-    [ ] Add method to calculate final price
-    [ ] Run test and make it pass
+[x] Implement CarRental entity
+    [x] Create CarRental with @Entity
+    [x] Fields: id, confirmationNumber, rental details, appliedDiscount
+    [x] Add method to calculate final price
+    [x] Run test and make it pass
 
-[ ] Write test for CarRentalService
-    [ ] Create CarRentalServiceTest
-    [ ] Test rentCar with discount
-    [ ] Test rentCar without discount
-    [ ] Test car unavailable scenario
-    [ ] Run test (expect failure)
+[x] Write test for CarRentalService
+    [x] Create CarRentalServiceTest
+    [x] Test rentCar with discount
+    [x] Test rentCar without discount
+    [x] Test car unavailable scenario
+    [x] Run test (expect failure)
 
-[ ] Implement CarRentalService
-    [ ] Create service with rentCar method
-    [ ] Apply discount if present
-    [ ] Handle availability
-    [ ] Run test and make it pass
+[x] Implement CarRentalService
+    [x] Create service with rentCar method
+    [x] Apply discount if present
+    [x] Handle availability
+    [x] Run test and make it pass
 
-[ ] Run all tests and commit when passing
+[x] Run all tests and commit when passing
 ```
 
 ---
