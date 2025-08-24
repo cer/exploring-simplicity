@@ -1,5 +1,6 @@
 package com.travelbooking.pojos;
 
+import com.travelbooking.pojos.api.TravelerInfo;
 import com.travelbooking.pojos.cars.CarRental;
 import com.travelbooking.pojos.cars.CarRentalException;
 import com.travelbooking.pojos.cars.CarRentalRequest;
@@ -16,6 +17,7 @@ import com.travelbooking.pojos.hotels.HotelReservation;
 import com.travelbooking.pojos.hotels.HotelReservationService;
 import com.travelbooking.pojos.itineraries.Itinerary;
 import com.travelbooking.pojos.travelers.Traveler;
+import com.travelbooking.pojos.travelers.TravelerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,9 +50,13 @@ class TripBookingServiceTest {
     @Mock
     private CarRentalService carRentalService;
     
+    @Mock
+    private TravelerRepository travelerRepository;
+    
     @InjectMocks
     private TripBookingService tripBookingService;
     
+    private TravelerInfo travelerInfo;
     private Traveler traveler;
     private FlightRequest flightRequest;
     private HotelRequest hotelRequest;
@@ -62,6 +68,7 @@ class TripBookingServiceTest {
 
     @BeforeEach
     void setUp() {
+        travelerInfo = new TravelerInfo("John Doe", "john.doe@example.com");
         traveler = new Traveler("John Doe", "john.doe@example.com");
         
         flightRequest = new FlightRequest(
@@ -124,12 +131,14 @@ class TripBookingServiceTest {
 
     @Test
     void testBookItinerarySuccessfullyWithCarRental() {
+        when(travelerRepository.findByEmail(travelerInfo.email())).thenReturn(Optional.empty());
+        when(travelerRepository.save(any(Traveler.class))).thenReturn(traveler);
         when(flightBookingService.bookFlight(traveler, flightRequest)).thenReturn(mockFlight);
         when(hotelReservationService.reserveHotel(traveler, hotelRequest)).thenReturn(mockHotel);
         when(discountService.carRentalDiscount(mockFlight, mockHotel)).thenReturn(Optional.of(mockDiscount));
         when(carRentalService.rentCar(traveler, carRequest, Optional.of(mockDiscount))).thenReturn(mockCar);
         
-        Itinerary result = tripBookingService.bookItinerary(traveler, flightRequest, hotelRequest, Optional.of(carRequest));
+        Itinerary result = tripBookingService.bookItinerary(travelerInfo, flightRequest, hotelRequest, Optional.of(carRequest));
         
         assertThat(result).isNotNull();
         assertThat(result.getFlightBooking()).isEqualTo(mockFlight);
@@ -144,10 +153,12 @@ class TripBookingServiceTest {
 
     @Test
     void testBookItinerarySuccessfullyWithoutCarRental() {
+        when(travelerRepository.findByEmail(travelerInfo.email())).thenReturn(Optional.empty());
+        when(travelerRepository.save(any(Traveler.class))).thenReturn(traveler);
         when(flightBookingService.bookFlight(traveler, flightRequest)).thenReturn(mockFlight);
         when(hotelReservationService.reserveHotel(traveler, hotelRequest)).thenReturn(mockHotel);
         
-        Itinerary result = tripBookingService.bookItinerary(traveler, flightRequest, hotelRequest, Optional.empty());
+        Itinerary result = tripBookingService.bookItinerary(travelerInfo, flightRequest, hotelRequest, Optional.empty());
         
         assertThat(result).isNotNull();
         assertThat(result.getFlightBooking()).isEqualTo(mockFlight);
@@ -162,6 +173,8 @@ class TripBookingServiceTest {
 
     @Test
     void testBookItineraryWithCarButNoDiscount() {
+        when(travelerRepository.findByEmail(travelerInfo.email())).thenReturn(Optional.empty());
+        when(travelerRepository.save(any(Traveler.class))).thenReturn(traveler);
         when(flightBookingService.bookFlight(traveler, flightRequest)).thenReturn(mockFlight);
         when(hotelReservationService.reserveHotel(traveler, hotelRequest)).thenReturn(mockHotel);
         when(discountService.carRentalDiscount(mockFlight, mockHotel)).thenReturn(Optional.empty());
@@ -179,7 +192,7 @@ class TripBookingServiceTest {
         );
         when(carRentalService.rentCar(traveler, carRequest, Optional.empty())).thenReturn(carWithoutDiscount);
         
-        Itinerary result = tripBookingService.bookItinerary(traveler, flightRequest, hotelRequest, Optional.of(carRequest));
+        Itinerary result = tripBookingService.bookItinerary(travelerInfo, flightRequest, hotelRequest, Optional.of(carRequest));
         
         assertThat(result).isNotNull();
         assertThat(result.getCarRental()).isEqualTo(carWithoutDiscount);
@@ -191,10 +204,12 @@ class TripBookingServiceTest {
 
     @Test
     void testBookItineraryFailsWhenFlightBookingFails() {
+        when(travelerRepository.findByEmail(travelerInfo.email())).thenReturn(Optional.empty());
+        when(travelerRepository.save(any(Traveler.class))).thenReturn(traveler);
         when(flightBookingService.bookFlight(traveler, flightRequest))
             .thenThrow(new FlightBookingException("Flight unavailable"));
         
-        assertThatThrownBy(() -> tripBookingService.bookItinerary(traveler, flightRequest, hotelRequest, Optional.of(carRequest)))
+        assertThatThrownBy(() -> tripBookingService.bookItinerary(travelerInfo, flightRequest, hotelRequest, Optional.of(carRequest)))
             .isInstanceOf(FlightBookingException.class)
             .hasMessage("Flight unavailable");
         
@@ -205,11 +220,13 @@ class TripBookingServiceTest {
 
     @Test
     void testBookItineraryFailsWhenHotelBookingFails() {
+        when(travelerRepository.findByEmail(travelerInfo.email())).thenReturn(Optional.empty());
+        when(travelerRepository.save(any(Traveler.class))).thenReturn(traveler);
         when(flightBookingService.bookFlight(traveler, flightRequest)).thenReturn(mockFlight);
         when(hotelReservationService.reserveHotel(traveler, hotelRequest))
             .thenThrow(new IllegalStateException("No hotels available"));
         
-        assertThatThrownBy(() -> tripBookingService.bookItinerary(traveler, flightRequest, hotelRequest, Optional.of(carRequest)))
+        assertThatThrownBy(() -> tripBookingService.bookItinerary(travelerInfo, flightRequest, hotelRequest, Optional.of(carRequest)))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("No hotels available");
         
@@ -220,6 +237,8 @@ class TripBookingServiceTest {
 
     @Test
     void testBookItinerarySucceedsEvenWhenCarRentalFails() {
+        when(travelerRepository.findByEmail(travelerInfo.email())).thenReturn(Optional.empty());
+        when(travelerRepository.save(any(Traveler.class))).thenReturn(traveler);
         when(flightBookingService.bookFlight(traveler, flightRequest)).thenReturn(mockFlight);
         when(hotelReservationService.reserveHotel(traveler, hotelRequest)).thenReturn(mockHotel);
         when(discountService.carRentalDiscount(mockFlight, mockHotel)).thenReturn(Optional.of(mockDiscount));
@@ -227,7 +246,7 @@ class TripBookingServiceTest {
             .thenThrow(new CarRentalException("Car rental system error"));
         
         // Car rental is optional, so the booking should still succeed
-        Itinerary result = tripBookingService.bookItinerary(traveler, flightRequest, hotelRequest, Optional.of(carRequest));
+        Itinerary result = tripBookingService.bookItinerary(travelerInfo, flightRequest, hotelRequest, Optional.of(carRequest));
         
         assertThat(result).isNotNull();
         assertThat(result.getFlightBooking()).isEqualTo(mockFlight);

@@ -1,5 +1,6 @@
 package com.travelbooking.pojos.travelers;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +16,8 @@ public class Traveler {
     private UUID id;
     
     private String name;
+    
+    @Column(unique = true)
     private String email;
 
     protected Traveler() {

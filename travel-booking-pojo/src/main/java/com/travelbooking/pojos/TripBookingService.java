@@ -1,5 +1,6 @@
 package com.travelbooking.pojos;
 
+import com.travelbooking.pojos.api.TravelerInfo;
 import com.travelbooking.pojos.cars.CarRental;
 import com.travelbooking.pojos.cars.CarRentalException;
 import com.travelbooking.pojos.cars.CarRentalRequest;
@@ -14,6 +15,7 @@ import com.travelbooking.pojos.hotels.HotelReservation;
 import com.travelbooking.pojos.hotels.HotelReservationService;
 import com.travelbooking.pojos.itineraries.Itinerary;
 import com.travelbooking.pojos.travelers.Traveler;
+import com.travelbooking.pojos.travelers.TravelerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,15 +32,18 @@ public class TripBookingService {
     private final HotelReservationService hotelReservationService;
     private final DiscountService discountService;
     private final CarRentalService carRentalService;
+    private final TravelerRepository travelerRepository;
 
     public TripBookingService(FlightBookingService flightBookingService,
                              HotelReservationService hotelReservationService,
                              DiscountService discountService,
-                             CarRentalService carRentalService) {
+                             CarRentalService carRentalService,
+                             TravelerRepository travelerRepository) {
         this.flightBookingService = flightBookingService;
         this.hotelReservationService = hotelReservationService;
         this.discountService = discountService;
         this.carRentalService = carRentalService;
+        this.travelerRepository = travelerRepository;
     }
 
     /**
@@ -46,12 +51,19 @@ public class TripBookingService {
      * and (optionally) rents a car. Returns the final itinerary.
      */
     @Transactional
-    public Itinerary bookItinerary(Traveler traveler,
+    public Itinerary bookItinerary(TravelerInfo travelerInfo,
                                   FlightRequest flightRequest,
                                   HotelRequest hotelRequest,
                                   Optional<CarRentalRequest> carRequest) {
         
-        logger.info("Starting itinerary booking for traveler: {}", traveler.getEmail());
+        logger.info("Starting itinerary booking for traveler: {}", travelerInfo.email());
+        
+        // Find existing traveler or create new one
+        Traveler traveler = travelerRepository.findByEmail(travelerInfo.email())
+                .orElseGet(() -> {
+                    Traveler newTraveler = new Traveler(travelerInfo.name(), travelerInfo.email());
+                    return travelerRepository.save(newTraveler);
+                });
         
         // Book flight (required)
         FlightBooking flight = flightBookingService.bookFlight(traveler, flightRequest);

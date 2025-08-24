@@ -34,6 +34,7 @@ class IntegrationTestsPlugin implements Plugin<Project> {
             classpath = project.sourceSets.integrationTest.runtimeClasspath
             shouldRunAfter("test")
             useJUnitPlatform()
+            forkEvery = 1
         }
         project.tasks.findByName("check").dependsOn(project.tasks.integrationTest)
         

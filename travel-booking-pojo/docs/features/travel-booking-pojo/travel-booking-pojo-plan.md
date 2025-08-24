@@ -351,54 +351,54 @@ Expose the trip booking functionality via REST API.
 ```text
 Implement REST controller for trip booking following TDD:
 
-[ ] Write test for TripBookingRequest DTO
-    [ ] Create TripBookingRequestTest
-    [ ] Test validation of nested objects
-    [ ] Test optional car rental request
-    [ ] Run test (expect failure)
+[x] Write test for TripBookingRequest DTO
+    [x] Create TripBookingRequestTest
+    [x] Test validation of nested objects
+    [x] Test optional car rental request
+    [x] Run test (expect failure)
 
-[ ] Implement TripBookingRequest DTO
-    [ ] Create composite DTO as Java record containing all requests
-    [ ] Include Traveler info, FlightRequest, HotelRequest, Optional CarRentalRequest
-    [ ] Add validation annotations
-    [ ] Run test and make it pass
+[x] Implement TripBookingRequest DTO
+    [x] Create composite DTO as Java record containing all requests
+    [x] Include Traveler info, FlightRequest, HotelRequest, Optional CarRentalRequest
+    [x] Add validation annotations
+    [x] Run test and make it pass
 
-[ ] Write test for TripBookingResponse DTO
-    [ ] Create TripBookingResponseTest
-    [ ] Test mapping from Itinerary to response
-    [ ] Include confirmation numbers and total price
-    [ ] Run test (expect failure)
+[x] Write test for TripBookingResponse DTO
+    [x] Create TripBookingResponseTest
+    [x] Test mapping from Itinerary to response
+    [x] Include confirmation numbers and total price
+    [x] Run test (expect failure)
 
-[ ] Implement TripBookingResponse DTO
-    [ ] Create response DTO as Java record with all booking confirmations
-    [ ] Add static factory method from Itinerary
-    [ ] Run test and make it pass
+[x] Implement TripBookingResponse DTO
+    [x] Create response DTO as Java record with all booking confirmations
+    [x] Add static factory method from Itinerary
+    [x] Run test and make it pass
 
-[ ] Write test for TripBookingController
-    [ ] Create TripBookingControllerTest with @WebMvcTest
-    [ ] Mock TripBookingService
-    [ ] Test POST /api/itineraries success (200)
-    [ ] Test validation failure (400)
-    [ ] Test booking conflict (409)
-    [ ] Test server error (500)
-    [ ] Run test (expect failure)
+[x] Write test for TripBookingController
+    [x] Create TripBookingControllerTest with @WebMvcTest
+    [x] Mock TripBookingService
+    [x] Test POST /api/itineraries success (200)
+    [x] Test validation failure (400)
+    [x] Test booking conflict (409)
+    [x] Test server error (500)
+    [x] Run test (expect failure)
 
-[ ] Implement TripBookingController
-    [ ] Create controller with @RestController
-    [ ] Add POST /api/itineraries endpoint
-    [ ] Implement request validation with @Valid
-    [ ] Map service exceptions to HTTP status codes
-    [ ] Add proper logging
-    [ ] Run test and make it pass
+[x] Implement TripBookingController
+    [x] Create controller with @RestController
+    [x] Add POST /api/itineraries endpoint
+    [x] Implement request validation with @Valid
+    [x] Map service exceptions to HTTP status codes
+    [x] Add proper logging
+    [x] Run test and make it pass
 
-[ ] Write integration test for full API flow
-    [ ] Create TripBookingApiIntegrationTest
-    [ ] Use TestRestTemplate or MockMvc
-    [ ] Test complete booking flow
-    [ ] Verify response structure
-    [ ] Run test and make it pass
+[x] Write integration test for full API flow
+    [x] Create TripBookingApiIntegrationTest
+    [x] Use TestRestTemplate or MockMvc
+    [x] Test complete booking flow
+    [x] Verify response structure
+    [x] Run test and make it pass
 
-[ ] Run all tests and commit when passing
+[x] Run all tests and commit when passing
 ```
 
 ---
