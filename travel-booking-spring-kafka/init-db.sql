@@ -15,3 +15,16 @@ GRANT ALL PRIVILEGES ON DATABASE tripbooking TO tripuser;
 GRANT ALL PRIVILEGES ON DATABASE flightdb TO flightuser;
 GRANT ALL PRIVILEGES ON DATABASE hoteldb TO hoteluser;
 GRANT ALL PRIVILEGES ON DATABASE cardb TO caruser;
+
+-- PostgreSQL 15+ requires explicit schema permissions
+\c tripbooking
+GRANT ALL ON SCHEMA public TO tripuser;
+
+\c flightdb
+GRANT ALL ON SCHEMA public TO flightuser;
+
+\c hoteldb
+GRANT ALL ON SCHEMA public TO hoteluser;
+
+\c cardb
+GRANT ALL ON SCHEMA public TO caruser;

@@ -1,0 +1,22 @@
+[tasks.compose-up]
+description = "Build JARs and start Docker Compose services"
+run = [
+    "./gradlew bootJar",
+    "docker compose up -d --wait"
+]
+
+[tasks.compose-down]
+description = "Stop and remove Docker Compose services"
+run = "docker compose down"
+
+[tasks.compose-logs]
+description = "Show logs from Docker Compose services"
+run = "docker compose logs -f"
+
+[tasks.compose-restart]
+description = "Rebuild JARs and restart services"
+run = [
+    "./gradlew bootJar",
+    "docker compose down",
+    "docker compose up -d --wait"
+]
