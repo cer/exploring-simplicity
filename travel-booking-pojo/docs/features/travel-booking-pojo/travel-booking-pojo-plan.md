@@ -67,29 +67,29 @@ Create the core domain entity for travelers with persistence capability.
 ```text
 Implement the Traveler entity with JPA persistence following TDD:
 
-[ ] Write test for Traveler entity
-    [ ] Create TravelerTest class
-    [ ] Test Traveler creation with required fields (id, name, email)
-    [ ] Run test (expect failure)
+[x] Write test for Traveler entity
+    [x] Create TravelerTest class
+    [x] Test Traveler creation with required fields (id, name, email)
+    [x] Run test (expect failure)
 
-[ ] Implement Traveler entity
-    [ ] Create Traveler class with @Entity annotation
-    [ ] Add fields: id (UUID), name (String), email (String)
-    [ ] Implement as JPA entity with standard constructors
-    [ ] Run test and make it pass
+[x] Implement Traveler entity
+    [x] Create Traveler class with @Entity annotation
+    [x] Add fields: id (UUID), name (String), email (String)
+    [x] Implement as JPA entity with standard constructors
+    [x] Run test and make it pass
 
-[ ] Write repository integration test
-    [ ] Create TravelerRepositoryTest with @DataJpaTest
-    [ ] Test saving and retrieving a Traveler
-    [ ] Test finding by email
-    [ ] Run test (expect failure)
+[x] Write repository integration test
+    [x] Create TravelerRepositoryTest with @DataJpaTest
+    [x] Test saving and retrieving a Traveler
+    [x] Test finding by email - SKIPPED (no business need for custom finders)
+    [x] Run test (expect failure)
 
-[ ] Implement TravelerRepository
-    [ ] Create TravelerRepository interface extending JpaRepository
-    [ ] Add custom query method: findByEmail
-    [ ] Run test and make it pass
+[x] Implement TravelerRepository
+    [x] Create TravelerRepository interface extending JpaRepository
+    [x] Add custom query method: findByEmail - SKIPPED (no business need)
+    [x] Run test and make it pass
 
-[ ] Run all tests and commit when passing
+[x] Run all tests and commit when passing
 ```
 
 ---
