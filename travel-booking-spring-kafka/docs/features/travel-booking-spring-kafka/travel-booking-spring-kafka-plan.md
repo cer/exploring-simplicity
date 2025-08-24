@@ -205,27 +205,27 @@ Implement the Discount Service for calculating car rental discounts.
 
 Using TDD approach:
 
-[ ] Write test for Discount value object
-[ ] Implement Discount class with percentage, code, validUntil fields
-[ ] Write test for Discount.applyTo() calculation
-[ ] Implement discount calculation logic
+[x] Write test for Discount value object
+[x] Implement Discount class with percentage, code, validUntil fields
+[x] Write test for Discount.applyTo() calculation
+[x] Implement discount calculation logic
 
-[ ] Write test for DiscountQueryCommand record
-[ ] Implement DiscountQueryCommand with correlationId and discount code
-[ ] Write test for DiscountQueryReply record
-[ ] Implement DiscountQueryReply with discount details
+[x] Write test for DiscountQueryCommand record
+[x] Implement DiscountQueryCommand with correlationId and discount code
+[x] Write test for DiscountQueryReply record
+[x] Implement DiscountQueryReply with discount details
 
-[ ] Write test for DiscountCalculator.calculateDiscount() with valid code
-[ ] Implement DiscountCalculator with business rules (hardcoded discounts for now)
+[x] Write test for DiscountCalculator.calculateDiscount() with valid code
+[x] Implement DiscountCalculator with business rules (hardcoded discounts for now)
 
-[ ] Write test for DiscountQueryHandler Kafka listener
-[ ] Implement DiscountQueryHandler with @KafkaListener
-[ ] Write test for discount query processing
-[ ] Implement query processing and response publishing
+[x] Write test for DiscountQueryHandler Kafka listener
+[x] Implement DiscountQueryHandler with @KafkaListener
+[x] Write test for discount query processing
+[x] Implement query processing and response publishing
 
-[ ] Configure application.yml (no database needed)
-[ ] Write integration test with embedded Kafka
-[ ] Verify service starts and processes queries
+[x] Configure application.yml (no database needed)
+[x] Write integration test with embedded Kafka
+[x] Verify service starts and processes queries
 
 The service should:
 - Be stateless (no database)
