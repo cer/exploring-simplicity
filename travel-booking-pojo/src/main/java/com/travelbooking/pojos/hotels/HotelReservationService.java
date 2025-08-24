@@ -22,6 +22,11 @@ public class HotelReservationService {
         Traveler traveler = travelerRepository.findById(travelerId)
             .orElseThrow(() -> new IllegalArgumentException("Traveler not found with id: " + travelerId));
         
+        return reserveHotel(traveler, request);
+    }
+    
+    public HotelReservation reserveHotel(Traveler traveler, HotelRequest request) {
+        
         if (!isHotelAvailable(request)) {
             throw new IllegalStateException("No hotels available in " + request.location());
         }

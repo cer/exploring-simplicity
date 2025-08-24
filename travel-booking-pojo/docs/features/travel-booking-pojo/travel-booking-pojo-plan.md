@@ -296,47 +296,47 @@ Implement the core orchestration logic that coordinates all booking services.
 ```text
 Implement TripBookingService orchestration following TDD:
 
-[ ] Write test for Itinerary entity
-    [ ] Create ItineraryTest
-    [ ] Test creation with flight, hotel, optional car
-    [ ] Test total price calculation
-    [ ] Run test (expect failure)
+[x] Write test for Itinerary entity
+    [x] Create ItineraryTest
+    [x] Test creation with flight, hotel, optional car
+    [x] Test total price calculation
+    [x] Run test (expect failure)
 
-[ ] Implement Itinerary entity
-    [ ] Create Itinerary with @Entity
-    [ ] OneToOne relationships to FlightBooking, HotelReservation
-    [ ] Optional OneToOne to CarRental
-    [ ] Add method to calculate total cost
-    [ ] Run test and make it pass
+[x] Implement Itinerary entity
+    [x] Create Itinerary with @Entity
+    [x] OneToOne relationships to FlightBooking, HotelReservation
+    [x] Optional OneToOne to CarRental
+    [x] Add method to calculate total cost
+    [x] Run test and make it pass
 
-[ ] Write comprehensive test for TripBookingService
-    [ ] Create TripBookingServiceTest
-    [ ] Mock all dependent services
-    [ ] Test successful booking with car rental
-    [ ] Test successful booking without car rental
-    [ ] Test flight booking failure (should not book hotel)
-    [ ] Test hotel booking failure (should rollback flight)
-    [ ] Run test (expect failure)
+[x] Write comprehensive test for TripBookingService
+    [x] Create TripBookingServiceTest
+    [x] Mock all dependent services
+    [x] Test successful booking with car rental
+    [x] Test successful booking without car rental
+    [x] Test flight booking failure (should not book hotel)
+    [x] Test hotel booking failure (should rollback flight)
+    [x] Run test (expect failure)
 
-[ ] Implement TripBookingService
-    [ ] Create TripBookingService with all service dependencies
-    [ ] Implement bookItinerary method as specified
-    [ ] Ensure proper exception propagation
-    [ ] Run test and make it pass
+[x] Implement TripBookingService
+    [x] Create TripBookingService with all service dependencies
+    [x] Implement bookItinerary method as specified
+    [x] Ensure proper exception propagation
+    [x] Run test and make it pass
 
-[ ] Write integration test for orchestration
-    [ ] Create TripBookingServiceIntegrationTest
-    [ ] Test with real service implementations (using test data)
-    [ ] Verify transactional behavior
-    [ ] Test rollback on failure
-    [ ] Run test (expect failure initially)
+[x] Write integration test for orchestration
+    [x] Create TripBookingServiceIntegrationTest
+    [x] Test with real service implementations (using test data)
+    [x] Verify transactional behavior
+    [x] Test rollback on failure
+    [x] Run test (expect failure initially)
 
-[ ] Add @Transactional annotation
-    [ ] Add @Transactional to bookItinerary method
-    [ ] Configure transaction propagation
-    [ ] Run integration test and make it pass
+[x] Add @Transactional annotation
+    [x] Add @Transactional to bookItinerary method
+    [x] Configure transaction propagation
+    [x] Run integration test and make it pass
 
-[ ] Run all tests and commit when passing
+[x] Run all tests and commit when passing
 ```
 
 ---

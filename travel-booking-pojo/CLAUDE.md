@@ -4,3 +4,4 @@
 - JPA Don't need setters unless they are required by the domain logic
 - Don't write tests for constructors, e.g. testTravelerWithNoArgsConstructor
 - Don't add finders to repositories unless they are needed by the business logic
+- IMPORTANT do not disable pre-commit hooks
