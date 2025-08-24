@@ -5,6 +5,8 @@ plugins {
     id 'jacoco'
 }
 
+apply plugin: com.travelbooking.plugins.IntegrationTestsPlugin
+
 group = 'com.travelbooking'
 version = '0.0.1-SNAPSHOT'
 

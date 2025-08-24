@@ -1,5 +1,6 @@
 package com.travelbooking.monolith.service;
 
+import com.travelbooking.monolith.BaseIntegrationTest;
 import com.travelbooking.monolith.domain.FlightBooking;
 import com.travelbooking.monolith.domain.Traveler;
 import com.travelbooking.monolith.dto.FlightRequest;
@@ -7,8 +8,6 @@ import com.travelbooking.monolith.repository.FlightBookingRepository;
 import com.travelbooking.monolith.repository.TravelerRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -17,10 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static com.travelbooking.monolith.testdata.TravelTestData.JFK;
 import static com.travelbooking.monolith.testdata.TravelTestData.LAX;
 
-@SpringBootTest
-@ActiveProfiles("test")
 @Transactional
-class FlightBookingServiceIntegrationTest {
+class FlightBookingServiceIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private FlightBookingService flightBookingService;

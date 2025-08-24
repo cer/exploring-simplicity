@@ -19,21 +19,6 @@ defaults:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: travel_user
-          POSTGRES_PASSWORD: travel_password
-          POSTGRES_DB: travel_booking
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
 
     steps:
       - name: Checkout code
@@ -56,12 +41,11 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build --build-cache --no-daemon
 
-      - name: Run tests
+      - name: Run unit tests
         run: ./gradlew test --build-cache --no-daemon
-        env:
-          DB_URL: jdbc:postgresql://localhost:5432/travel_booking
-          DB_USERNAME: travel_user
-          DB_PASSWORD: travel_password
+      
+      - name: Run integration tests
+        run: ./gradlew integrationTest --build-cache --no-daemon
 
       - name: Generate test report
         if: always()
