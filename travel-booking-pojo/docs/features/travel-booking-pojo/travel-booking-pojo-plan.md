@@ -70,14 +70,12 @@ Implement the Traveler entity with JPA persistence following TDD:
 [ ] Write test for Traveler entity
     [ ] Create TravelerTest class
     [ ] Test Traveler creation with required fields (id, name, email)
-    [ ] Test equals and hashCode methods
     [ ] Run test (expect failure)
 
 [ ] Implement Traveler entity
     [ ] Create Traveler class with @Entity annotation
     [ ] Add fields: id (UUID), name (String), email (String)
     [ ] Implement as JPA entity with standard constructors
-    [ ] Override equals and hashCode properly for JPA
     [ ] Run test and make it pass
 
 [ ] Write repository integration test
@@ -504,51 +502,29 @@ Implement database schema and migrations:
 
 ---
 
-## Steel Thread 11: Observability and Monitoring
+## Steel Thread 11: Health Check with Actuator
 
 ### Purpose
-Add logging, metrics, and health checks for production readiness.
+Add Spring Boot Actuator with default health check endpoint.
 
 ### Implementation Prompt
 
 ```text
-Implement observability features following TDD:
+Add Spring Boot Actuator for basic health monitoring:
+
+[ ] Add Spring Boot Actuator dependency
+    [ ] Add spring-boot-starter-actuator to build.gradle
+    [ ] Run ./gradlew build to verify dependency is added
 
 [ ] Write test for health check endpoint
     [ ] Create HealthCheckTest
-    [ ] Test /actuator/health endpoint
-    [ ] Test custom health indicator
+    [ ] Test that /actuator/health endpoint returns 200 OK
+    [ ] Test that response contains "status": "UP"
     [ ] Run test (expect failure)
 
-[ ] Implement health checks
-    [ ] Add Spring Boot Actuator dependency
-    [ ] Configure health endpoint
-    [ ] Create custom health indicator for database
-    [ ] Run test and make it pass
-
-[ ] Write test for logging aspects
-    [ ] Create LoggingAspectTest
-    [ ] Test method entry/exit logging
-    [ ] Test exception logging
-    [ ] Run test (expect failure)
-
-[ ] Implement structured logging
-    [ ] Add logging aspect for service methods
-    [ ] Use SLF4J with structured logging
-    [ ] Include correlation IDs in logs
-    [ ] Log booking confirmations
-    [ ] Run test and make it pass
-
-[ ] Write test for metrics
-    [ ] Test booking success/failure counters
-    [ ] Test response time metrics
-    [ ] Run test (expect failure)
-
-[ ] Implement metrics collection
-    [ ] Add Micrometer dependency
-    [ ] Create custom metrics for bookings
-    [ ] Add timing metrics for service calls
-    [ ] Expose metrics endpoint
+[ ] Configure Actuator
+    [ ] Add configuration to application.properties
+    [ ] Enable health endpoint (management.endpoints.web.exposure.include=health)
     [ ] Run test and make it pass
 
 [ ] Run all tests and commit when passing
@@ -651,3 +627,5 @@ After completing all steel threads, verify:
 - Added Testcontainers for Docker image testing instead of shell scripts
 - Removed Steel Thread 13 (Performance and Load Testing)
 - Added explicit use of Java records for all DTO implementations
+- Removed requirement to override equals/hashCode methods in entities (not required for basic JPA functionality)
+- Simplified Steel Thread 11 to only add Spring Boot Actuator with default health check (removed custom logging, metrics, and health indicators)
