@@ -47,15 +47,17 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build --no-daemon
+        run: ./gradlew build --build-cache --no-daemon
 
       - name: Run tests
-        run: ./gradlew test --no-daemon
+        run: ./gradlew test --build-cache --no-daemon
         env:
           DB_URL: jdbc:postgresql://localhost:5432/travel_booking
           DB_USERNAME: travel_user
@@ -63,7 +65,7 @@ jobs:
 
       - name: Generate test report
         if: always()
-        run: ./gradlew jacocoTestReport --no-daemon
+        run: ./gradlew jacocoTestReport --build-cache --no-daemon
 
       - name: Upload test results
         if: always()
@@ -80,7 +82,7 @@ jobs:
           path: travel-booking-pojo/build/reports/jacoco/test/
 
       - name: Build JAR
-        run: ./gradlew bootJar --no-daemon
+        run: ./gradlew bootJar --build-cache --no-daemon
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
