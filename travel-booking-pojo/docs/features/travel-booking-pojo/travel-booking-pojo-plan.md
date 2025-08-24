@@ -104,47 +104,47 @@ Implement flight booking capability with service and entity.
 ```text
 Implement FlightBooking entity and FlightBookingService following TDD:
 
-[ ] Write test for FlightRequest DTO
-    [ ] Create FlightRequestTest
-    [ ] Test validation constraints (departure, arrival, date)
-    [ ] Run test (expect failure)
+[x] Write test for FlightRequest DTO
+    [x] Create FlightRequestTest
+    [x] Test validation constraints (departure, arrival, date)
+    [x] Run test (expect failure)
 
-[ ] Implement FlightRequest DTO
-    [ ] Create FlightRequest as Java record with validation annotations
-    [ ] Fields: departure, arrival, departureDate, returnDate
-    [ ] Run test and make it pass
+[x] Implement FlightRequest DTO
+    [x] Create FlightRequest as Java record with validation annotations
+    [x] Fields: departure, arrival, departureDate, returnDate
+    [x] Run test and make it pass
 
-[ ] Write test for FlightBooking entity
-    [ ] Create FlightBookingTest
-    [ ] Test entity creation with all required fields
-    [ ] Test relationship with Traveler
-    [ ] Run test (expect failure)
+[x] Write test for FlightBooking entity
+    [x] Create FlightBookingTest
+    [x] Test entity creation with all required fields
+    [x] Test relationship with Traveler
+    [x] Run test (expect failure)
 
-[ ] Implement FlightBooking entity
-    [ ] Create FlightBooking with @Entity
-    [ ] Fields: id, confirmationNumber, traveler (ManyToOne), flight details
-    [ ] Run test and make it pass
+[x] Implement FlightBooking entity
+    [x] Create FlightBooking with @Entity
+    [x] Fields: id, confirmationNumber, traveler (ManyToOne), flight details
+    [x] Run test and make it pass
 
-[ ] Write test for FlightBookingService
-    [ ] Create FlightBookingServiceTest
-    [ ] Mock FlightBookingRepository
-    [ ] Test bookFlight method success case
-    [ ] Test flight unavailable exception case
-    [ ] Run test (expect failure)
+[x] Write test for FlightBookingService
+    [x] Create FlightBookingServiceTest
+    [x] Mock FlightBookingRepository
+    [x] Test bookFlight method success case
+    [x] Test flight unavailable exception case
+    [x] Run test (expect failure)
 
-[ ] Implement FlightBookingService
-    [ ] Create FlightBookingService class with @Service
-    [ ] Implement bookFlight method
-    [ ] Add business logic for availability check
-    [ ] Throw FlightBookingException when unavailable
-    [ ] Run test and make it pass
+[x] Implement FlightBookingService
+    [x] Create FlightBookingService class with @Service
+    [x] Implement bookFlight method
+    [x] Add business logic for availability check
+    [x] Throw FlightBookingException when unavailable
+    [x] Run test and make it pass
 
-[ ] Write integration test for flight booking
-    [ ] Test full flow from service to repository
-    [ ] Verify transaction handling
-    [ ] Run test and make it pass
+[x] Write integration test for flight booking
+    [x] Test full flow from service to repository
+    [x] Verify transaction handling
+    [x] Run test and make it pass
 
-[ ] Run all tests and commit when passing
+[x] Run all tests and commit when passing
 ```
 
 ---
