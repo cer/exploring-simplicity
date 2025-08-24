@@ -21,34 +21,34 @@ Set up the Spring Boot project structure with automated build and test pipeline.
 ```text
 Create a new Spring Boot project for the Monolithic Trip Booking Service with the following requirements:
 
-[ ] Initialize Spring Boot project using Spring Initializr with Gradle
-    [ ] Use Java 21
-    [ ] Select Gradle - Groovy as build tool
-    [ ] Include dependencies: Spring Web, Spring Data JPA, PostgreSQL Driver, Spring Validation, Flyway
-    [ ] Include test dependencies: Spring Boot Test, H2 Database, RestAssured, Testcontainers
-    [ ] Create project structure: com.travelbooking.monolith
+[x] Initialize Spring Boot project using Spring Initializr with Gradle
+    [x] Use Java 21
+    [x] Select Gradle - Groovy as build tool
+    [x] Include dependencies: Spring Web, Spring Data JPA, PostgreSQL Driver, Spring Validation, Flyway
+    [x] Include test dependencies: Spring Boot Test, H2 Database, RestAssured, Testcontainers
+    [x] Create project structure: com.travelbooking.monolith
 
-[ ] Set up Gradle build configuration
-    [ ] Review and update build.gradle (Groovy DSL) with proper dependency versions
-    [ ] Configure test task to show test output
-    [ ] Add gradle.properties for project settings
-    [ ] Configure Gradle wrapper for Java 21 compatibility
+[x] Set up Gradle build configuration
+    [x] Review and update build.gradle (Groovy DSL) with proper dependency versions
+    [x] Configure test task to show test output
+    [x] Add gradle.properties for project settings
+    [x] Configure Gradle wrapper for Java 21 compatibility
 
-[ ] Set up basic project configuration
-    [ ] Create application.properties for main configuration
-    [ ] Create application-test.properties for test configuration
-    [ ] Configure H2 for testing, PostgreSQL connection properties for production
+[x] Set up basic project configuration
+    [x] Create application.properties for main configuration
+    [x] Create application-test.properties for test configuration
+    [x] Configure H2 for testing, PostgreSQL connection properties for production
 
-[ ] Create GitHub Actions workflow for CI/CD
-    [ ] Create .github/workflows/ci.yml
-    [ ] Configure workflow to trigger on push and pull requests
-    [ ] Add steps: checkout, setup Java, run tests with Gradle, build JAR
-    [ ] Add Gradle caching for dependencies and build cache
+[x] Create GitHub Actions workflow for CI/CD
+    [x] Create .github/workflows/ci.yml
+    [x] Configure workflow to trigger on push and pull requests
+    [x] Add steps: checkout, setup Java, run tests with Gradle, build JAR
+    [x] Add Gradle caching for dependencies and build cache
 
-[ ] Write initial smoke test to verify setup
-    [ ] Create ApplicationContextTest that verifies Spring context loads
-    [ ] Run test locally using ./gradlew test
-    [ ] Commit when test passes
+[x] Write initial smoke test to verify setup
+    [x] Create ApplicationContextTest that verifies Spring context loads
+    [x] Run test locally using ./gradlew test
+    [x] Commit when test passes
 
 [ ] Verify CI pipeline
     [ ] Push to GitHub and verify workflow runs successfully
