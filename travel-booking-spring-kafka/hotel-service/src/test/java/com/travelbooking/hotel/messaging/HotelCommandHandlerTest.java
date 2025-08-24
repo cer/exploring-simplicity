@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -74,10 +74,10 @@ class HotelCommandHandlerTest {
         verify(kafkaTemplate).send(eq("hotel-service-replies"), eq(correlationId), eventCaptor.capture());
         
         HotelReservedEvent event = eventCaptor.getValue();
-        assertEquals(correlationId, event.correlationId());
-        assertEquals(reservation.getId().toString(), event.reservationId());
-        assertEquals(reservation.getConfirmationNumber(), event.confirmationNumber());
-        assertEquals(reservation.getTotalPrice(), event.totalPrice());
+        assertThat(event.correlationId()).isEqualTo(correlationId);
+        assertThat(event.reservationId()).isEqualTo(reservation.getId().toString());
+        assertThat(event.confirmationNumber()).isEqualTo(reservation.getConfirmationNumber());
+        assertThat(event.totalPrice()).isEqualTo(reservation.getTotalPrice());
     }
 
     @Test

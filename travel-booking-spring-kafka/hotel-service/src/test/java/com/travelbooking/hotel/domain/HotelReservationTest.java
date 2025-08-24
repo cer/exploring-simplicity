@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class HotelReservationTest {
 
@@ -28,13 +28,13 @@ class HotelReservationTest {
         reservation.setCheckOutDate(checkOutDate);
         reservation.setTotalPrice(totalPrice);
 
-        assertEquals(id, reservation.getId());
-        assertEquals(confirmationNumber, reservation.getConfirmationNumber());
-        assertEquals(travelerId, reservation.getTravelerId());
-        assertEquals(hotelName, reservation.getHotelName());
-        assertEquals(checkInDate, reservation.getCheckInDate());
-        assertEquals(checkOutDate, reservation.getCheckOutDate());
-        assertEquals(totalPrice, reservation.getTotalPrice());
+        assertThat(reservation.getId()).isEqualTo(id);
+        assertThat(reservation.getConfirmationNumber()).isEqualTo(confirmationNumber);
+        assertThat(reservation.getTravelerId()).isEqualTo(travelerId);
+        assertThat(reservation.getHotelName()).isEqualTo(hotelName);
+        assertThat(reservation.getCheckInDate()).isEqualTo(checkInDate);
+        assertThat(reservation.getCheckOutDate()).isEqualTo(checkOutDate);
+        assertThat(reservation.getTotalPrice()).isEqualTo(totalPrice);
     }
 
     @Test
@@ -43,6 +43,6 @@ class HotelReservationTest {
         reservation.setCheckInDate(LocalDate.of(2024, 12, 15));
         reservation.setCheckOutDate(LocalDate.of(2024, 12, 22));
 
-        assertEquals(7, reservation.getNumberOfNights());
+        assertThat(reservation.getNumberOfNights()).isEqualTo(7);
     }
 }

@@ -32,7 +32,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -101,26 +101,27 @@ class HotelServiceIntegrationTest {
 
         // Then - verify reply event
         ConsumerRecords<String, HotelReservedEvent> records = consumer.poll(Duration.ofSeconds(10));
-        assertFalse(records.isEmpty(), "Should receive reply event");
+        assertThat(records.isEmpty()).isFalse().as("Should receive reply event");
         
         HotelReservedEvent event = records.iterator().next().value();
-        assertEquals(correlationId, event.correlationId());
-        assertNotNull(event.reservationId());
-        assertNotNull(event.confirmationNumber());
-        assertTrue(event.confirmationNumber().startsWith("HR-"));
-        assertEquals(new BigDecimal("1050.00"), event.totalPrice()); // 7 nights * $150
+        assertThat(event.correlationId()).isEqualTo(correlationId);
+        assertThat(event.reservationId()).isNotNull();
+        assertThat(event.confirmationNumber())
+            .isNotNull()
+            .startsWith("HR-");
+        assertThat(event.totalPrice()).isEqualTo(new BigDecimal("1050.00")); // 7 nights * $150
 
         // Verify database state
         Thread.sleep(1000); // Give time for transaction to commit
         var reservations = repository.findAll();
-        assertEquals(1, reservations.size());
+        assertThat(reservations).hasSize(1);
         
         HotelReservation reservation = reservations.get(0);
-        assertEquals(UUID.fromString(travelerId), reservation.getTravelerId());
-        assertEquals(hotelName, reservation.getHotelName());
-        assertEquals(checkInDate, reservation.getCheckInDate());
-        assertEquals(checkOutDate, reservation.getCheckOutDate());
-        assertEquals(new BigDecimal("1050.00"), reservation.getTotalPrice());
+        assertThat(reservation.getTravelerId()).isEqualTo(UUID.fromString(travelerId));
+        assertThat(reservation.getHotelName()).isEqualTo(hotelName);
+        assertThat(reservation.getCheckInDate()).isEqualTo(checkInDate);
+        assertThat(reservation.getCheckOutDate()).isEqualTo(checkOutDate);
+        assertThat(reservation.getTotalPrice()).isEqualTo(new BigDecimal("1050.00"));
         
         consumer.close();
     }

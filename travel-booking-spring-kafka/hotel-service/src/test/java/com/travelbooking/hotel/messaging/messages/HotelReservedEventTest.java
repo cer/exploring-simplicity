@@ -3,7 +3,7 @@ package com.travelbooking.hotel.messaging.messages;
 import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class HotelReservedEventTest {
 
@@ -21,9 +21,9 @@ class HotelReservedEventTest {
             totalPrice
         );
 
-        assertEquals(correlationId, event.correlationId());
-        assertEquals(reservationId, event.reservationId());
-        assertEquals(confirmationNumber, event.confirmationNumber());
-        assertEquals(totalPrice, event.totalPrice());
+        assertThat(event.correlationId()).isEqualTo(correlationId);
+        assertThat(event.reservationId()).isEqualTo(reservationId);
+        assertThat(event.confirmationNumber()).isEqualTo(confirmationNumber);
+        assertThat(event.totalPrice()).isEqualTo(totalPrice);
     }
 }

@@ -3,7 +3,7 @@ package com.travelbooking.hotel.messaging.messages;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ReserveHotelCommandTest {
 
@@ -23,10 +23,10 @@ class ReserveHotelCommandTest {
             checkOutDate
         );
 
-        assertEquals(correlationId, command.correlationId());
-        assertEquals(travelerId, command.travelerId());
-        assertEquals(hotelName, command.hotelName());
-        assertEquals(checkInDate, command.checkInDate());
-        assertEquals(checkOutDate, command.checkOutDate());
+        assertThat(command.correlationId()).isEqualTo(correlationId);
+        assertThat(command.travelerId()).isEqualTo(travelerId);
+        assertThat(command.hotelName()).isEqualTo(hotelName);
+        assertThat(command.checkInDate()).isEqualTo(checkInDate);
+        assertThat(command.checkOutDate()).isEqualTo(checkOutDate);
     }
 }

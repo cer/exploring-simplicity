@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,21 +51,21 @@ class HotelReservationServiceTest {
 
         HotelReservation result = service.reserveHotel(travelerId, hotelName, checkInDate, checkOutDate);
 
-        assertNotNull(result);
-        assertEquals(hotelName, result.getHotelName());
-        assertEquals(checkInDate, result.getCheckInDate());
-        assertEquals(checkOutDate, result.getCheckOutDate());
-        assertNotNull(result.getConfirmationNumber());
-        assertNotNull(result.getTotalPrice());
+        assertThat(result).isNotNull();
+        assertThat(result.getHotelName()).isEqualTo(hotelName);
+        assertThat(result.getCheckInDate()).isEqualTo(checkInDate);
+        assertThat(result.getCheckOutDate()).isEqualTo(checkOutDate);
+        assertThat(result.getConfirmationNumber()).isNotNull();
+        assertThat(result.getTotalPrice()).isNotNull();
 
         ArgumentCaptor<HotelReservation> captor = ArgumentCaptor.forClass(HotelReservation.class);
         verify(repository).save(captor.capture());
         HotelReservation capturedReservation = captor.getValue();
         
-        assertEquals(UUID.fromString(travelerId), capturedReservation.getTravelerId());
-        assertEquals(hotelName, capturedReservation.getHotelName());
-        assertEquals(checkInDate, capturedReservation.getCheckInDate());
-        assertEquals(checkOutDate, capturedReservation.getCheckOutDate());
+        assertThat(capturedReservation.getTravelerId()).isEqualTo(UUID.fromString(travelerId));
+        assertThat(capturedReservation.getHotelName()).isEqualTo(hotelName);
+        assertThat(capturedReservation.getCheckInDate()).isEqualTo(checkInDate);
+        assertThat(capturedReservation.getCheckOutDate()).isEqualTo(checkOutDate);
     }
 
     @Test
@@ -79,7 +79,7 @@ class HotelReservationServiceTest {
 
         HotelReservation result = service.reserveHotel(travelerId, hotelName, checkInDate, checkOutDate);
 
-        assertEquals(new BigDecimal("1050.00"), result.getTotalPrice()); // 7 nights * $150 per night
+        assertThat(result.getTotalPrice()).isEqualTo(new BigDecimal("1050.00")); // 7 nights * $150 per night
     }
 
     @Test
@@ -93,7 +93,8 @@ class HotelReservationServiceTest {
 
         HotelReservation result = service.reserveHotel(travelerId, hotelName, checkInDate, checkOutDate);
 
-        assertNotNull(result.getConfirmationNumber());
-        assertTrue(result.getConfirmationNumber().startsWith("HR-"));
+        assertThat(result.getConfirmationNumber())
+            .isNotNull()
+            .startsWith("HR-");
     }
 }
