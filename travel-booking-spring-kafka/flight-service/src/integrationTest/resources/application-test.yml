@@ -1,48 +1,39 @@
 spring:
   application:
-    name: flight-service
+    name: flight-service-test
   
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/flightdb}
-    username: ${DATABASE_USER:flightuser}
-    password: ${DATABASE_PASSWORD:flightpass}
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:tc:postgresql:15:///flightdb
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    username: test
+    password: test
   
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+  
   sql:
     init:
       mode: always
       schema-locations: classpath:schema.sql
   
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
     consumer:
-      group-id: flight-service-group
+      group-id: flight-service-test
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-server:
-  port: 8080
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics
-  endpoint:
-    health:
-      show-details: always
-
 logging:
   level:
     com.travelbooking: DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg [correlationId=%X{correlationId}]%n"
+    org.springframework.kafka: INFO
