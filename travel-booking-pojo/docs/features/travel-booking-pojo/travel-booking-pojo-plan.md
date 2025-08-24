@@ -50,9 +50,9 @@ Create a new Spring Boot project for the Monolithic Trip Booking Service with th
     [x] Run test locally using ./gradlew test
     [x] Commit when test passes
 
-[ ] Verify CI pipeline
-    [ ] Push to GitHub and verify workflow runs successfully
-    [ ] Ensure all tests pass in CI environment
+[x] Verify CI pipeline
+    [x] Push to GitHub and verify workflow runs successfully
+    [x] Ensure all tests pass in CI environment
 ```
 
 ---
