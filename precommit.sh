@@ -4,12 +4,41 @@ set -e
 
 echo "Running pre-commit checks..."
 
-cd travel-booking-pojo
+# Function to check for uncommitted changes in a directory
+has_uncommitted_changes() {
+    local dir=$1
+    cd "$dir"
+    # Check for uncommitted changes (staged, unstaged, or untracked files)
+    if git status --porcelain | grep -q .; then
+        return 0  # Has changes
+    else
+        return 1  # No changes
+    fi
+}
 
-echo "Running tests..."
-./gradlew test
+# Get the root directory from the script's location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$SCRIPT_DIR"
 
-echo "Running integration tests..."
-./gradlew integrationTest
+# Process each directory
+for dir in travel-booking-pojo travel-booking-spring-kafka; do
+    if [ -d "$dir" ]; then
+        echo ""
+        echo "Checking $dir..."
+        
+        cd "$ROOT_DIR"
+        if has_uncommitted_changes "$dir"; then
+            echo "Found uncommitted changes in $dir, running gradlew check..."
+            cd "$ROOT_DIR/$dir"
+            ./gradlew check
+        else
+            echo "No uncommitted changes in $dir, skipping checks"
+        fi
+    else
+        echo "Directory $dir not found, skipping"
+    fi
+done
 
-echo "Pre-commit checks passed!"
+cd "$ROOT_DIR"
+echo ""
+echo "Pre-commit checks completed!"
