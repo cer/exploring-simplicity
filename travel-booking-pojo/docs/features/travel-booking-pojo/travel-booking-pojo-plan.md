@@ -207,31 +207,31 @@ Implement discount calculation based on flight and hotel bookings.
 ```text
 Implement DiscountService for car rental discounts following TDD:
 
-[ ] Write test for Discount entity
-    [ ] Create DiscountTest
-    [ ] Test discount creation with percentage and code
-    [ ] Run test (expect failure)
+[x] Write test for Discount entity
+    [x] Create DiscountTest
+    [x] Test discount creation with percentage and code
+    [x] Run test (expect failure)
 
-[ ] Implement Discount entity
-    [ ] Create Discount class (can be @Embeddable or @Entity)
-    [ ] Fields: percentage, discountCode, validUntil
-    [ ] Run test and make it pass
+[x] Implement Discount entity
+    [x] Create Discount class (can be @Embeddable or @Entity)
+    [x] Fields: percentage, discountCode, validUntil
+    [x] Run test and make it pass
 
-[ ] Write test for DiscountService
-    [ ] Create DiscountServiceTest
-    [ ] Test carRentalDiscount calculation based on flight and hotel
-    [ ] Test no discount scenario
-    [ ] Test premium booking discount scenario
-    [ ] Run test (expect failure)
+[x] Write test for DiscountService
+    [x] Create DiscountServiceTest
+    [x] Test carRentalDiscount calculation based on flight and hotel
+    [x] Test no discount scenario
+    [x] Test premium booking discount scenario
+    [x] Run test (expect failure)
 
-[ ] Implement DiscountService
-    [ ] Create DiscountService with @Service
-    [ ] Implement carRentalDiscount method
-    [ ] Add business rules for discount calculation
-    [ ] Return Optional<Discount>
-    [ ] Run test and make it pass
+[x] Implement DiscountService
+    [x] Create DiscountService with @Service
+    [x] Implement carRentalDiscount method
+    [x] Add business rules for discount calculation
+    [x] Return Optional<Discount>
+    [x] Run test and make it pass
 
-[ ] Run all tests and commit when passing
+[x] Run all tests and commit when passing
 ```
 
 ---
