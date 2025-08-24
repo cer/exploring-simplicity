@@ -1,6 +1,5 @@
 package com.travelbooking.pojos.hotels;
 
-import com.travelbooking.pojos.common.validation.ValidHotelDates;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;

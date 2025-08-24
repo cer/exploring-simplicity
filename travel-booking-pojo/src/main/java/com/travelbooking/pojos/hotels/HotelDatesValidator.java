@@ -1,6 +1,4 @@
-package com.travelbooking.pojos.common.validation;
-
-import com.travelbooking.pojos.hotels.HotelRequest;
+package com.travelbooking.pojos.hotels;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

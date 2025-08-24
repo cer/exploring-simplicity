@@ -1,4 +1,4 @@
-package com.travelbooking.pojos.common.validation;
+package com.travelbooking.pojos.hotels;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
