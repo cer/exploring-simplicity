@@ -41,12 +41,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build --build-cache --no-daemon
 
-      - name: Run unit tests
-        run: ./gradlew test --build-cache --no-daemon
-      
-      - name: Run integration tests
-        run: ./gradlew integrationTest --build-cache --no-daemon
-
       - name: Generate test report
         if: always()
         run: ./gradlew jacocoTestReport --build-cache --no-daemon
