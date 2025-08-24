@@ -83,7 +83,7 @@ Create the common module with shared constants.
 
 Tasks:
 
-[ ] Create Constants class with all Kafka topic names:
+[x] Create Constants class with all Kafka topic names:
   - flight-service-commands
   - flight-service-replies
   - hotel-service-commands
@@ -93,9 +93,11 @@ Tasks:
   - discount-service-queries
   - discount-service-replies
 
-[ ] Create shared utility classes if needed (e.g., JSON serialization helpers)
-[ ] Setup common module build.gradle with minimal dependencies
-[ ] Verify common module builds successfully
+[x] Create shared utility classes if needed (e.g., JSON serialization helpers)
+  - JsonUtils for JSON serialization/deserialization
+  - CorrelationIdHolder for managing correlation IDs
+[x] Setup common module build.gradle with minimal dependencies
+[x] Verify common module builds successfully
 
 Note: ProcessedMessage will be added later in Phase 2.
 Each service will define its own domain entities, commands, and events.
