@@ -1,0 +1,8 @@
+rootProject.name = 'travel-booking-spring-kafka'
+
+include 'common'
+include 'trip-booking-service'
+include 'flight-service'
+include 'hotel-service'
+include 'car-rental-service'
+include 'discount-service'
