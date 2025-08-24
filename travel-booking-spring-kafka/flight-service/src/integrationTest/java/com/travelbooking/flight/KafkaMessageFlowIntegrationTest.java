@@ -12,6 +12,7 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +75,16 @@ public class KafkaMessageFlowIntegrationTest {
         consumer.subscribe(Collections.singletonList(Constants.Topics.FLIGHT_SERVICE_REPLIES));
     }
 
+    @AfterEach
+    void tearDown() {
+        if (consumer != null) {
+            consumer.close();
+        }
+        if (producer != null) {
+            producer.close();
+        }
+    }
+
     @Test
     void shouldProcessCommandAndPublishEventWithCorrectStructure() throws Exception {
         // Given
@@ -119,7 +130,7 @@ public class KafkaMessageFlowIntegrationTest {
 
         FlightBookedEvent event = receivedEvent.get();
         assertThat(event).isNotNull();
-        assertThat(event.correlationId()).isEqualTo(correlationId.toString());
+        assertThat(event.correlationId()).isEqualTo(correlationId);
         assertThat(event.bookingId()).isNotNull();
         assertThat(event.confirmationNumber()).startsWith("FL-");
         assertThat(event.price()).isEqualTo(new BigDecimal("850.00"));
@@ -248,6 +259,6 @@ public class KafkaMessageFlowIntegrationTest {
                 });
 
         assertThat(receivedEvent.get()).isNotNull();
-        assertThat(receivedEvent.get().correlationId()).isEqualTo(correlationId.toString());
+        assertThat(receivedEvent.get().correlationId()).isEqualTo(correlationId);
     }
 }

@@ -14,6 +14,7 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,9 +80,11 @@ public class FlightServiceIntegrationTest {
         producer = new DefaultKafkaProducerFactory<>(producerProps, new StringSerializer(), new StringSerializer())
                 .createProducer();
 
-        // Set up Kafka consumer
-        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("test-group", "true", embeddedKafkaBroker);
+        // Set up Kafka consumer with unique group ID
+        String uniqueGroupId = "test-group-" + UUID.randomUUID();
+        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps(uniqueGroupId, "true", embeddedKafkaBroker);
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        consumerProps.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 10);
         consumer = new DefaultKafkaConsumerFactory<>(consumerProps, new StringDeserializer(), new StringDeserializer())
                 .createConsumer();
         consumer.subscribe(Collections.singletonList(Constants.Topics.FLIGHT_SERVICE_REPLIES));
@@ -89,6 +92,16 @@ public class FlightServiceIntegrationTest {
         // Clean up database
         flightBookingRepository.deleteAll();
         travelerRepository.deleteAll();
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (consumer != null) {
+            consumer.close();
+        }
+        if (producer != null) {
+            producer.close();
+        }
     }
 
     @Test
@@ -123,14 +136,7 @@ public class FlightServiceIntegrationTest {
         // When
         producer.send(new ProducerRecord<>(Constants.Topics.FLIGHT_SERVICE_COMMANDS, correlationId, commandJson)).get();
 
-        // Then - Wait for the event to be published
-        await().atMost(Duration.ofSeconds(10))
-                .until(() -> {
-                    ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-                    return records.count() > 0;
-                });
-
-        // Verify database state
+        // Then - Verify database state first (to ensure message was processed)
         await().atMost(Duration.ofSeconds(5))
                 .until(() -> travelerRepository.count() > 0);
 
@@ -150,17 +156,25 @@ public class FlightServiceIntegrationTest {
         assertThat(booking.get().getConfirmationNumber()).startsWith("FL-");
         assertThat(booking.get().getPrice()).isEqualTo(new BigDecimal("650.00"));
 
-        // Verify the event was published
-        ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1));
-        assertThat(records.count()).isEqualTo(1);
-        
-        records.forEach(record -> {
-            assertThat(record.key()).isEqualTo(correlationId);
-            assertThat(record.value()).contains("\"correlationId\":\"" + correlationId + "\"");
-            assertThat(record.value()).contains("\"confirmationNumber\":\"FL-");
-            assertThat(record.value()).contains("\"bookingId\":");
-            assertThat(record.value()).contains("\"price\":");
-        });
+        // Verify the event was published - wait for the specific message with our correlation ID
+        await().atMost(Duration.ofSeconds(10))
+                .untilAsserted(() -> {
+                    ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+                    boolean foundExpectedRecord = false;
+                    
+                    for (var record : records) {
+                        if (correlationId.equals(record.key())) {
+                            foundExpectedRecord = true;
+                            assertThat(record.value()).contains("\"correlationId\":\"" + correlationId + "\"");
+                            assertThat(record.value()).contains("\"confirmationNumber\":\"FL-");
+                            assertThat(record.value()).contains("\"bookingId\":");
+                            assertThat(record.value()).contains("\"price\":");
+                            break;
+                        }
+                    }
+                    
+                    assertThat(foundExpectedRecord).as("Should find record with correlationId: " + correlationId).isTrue();
+                });
     }
 
     @Test

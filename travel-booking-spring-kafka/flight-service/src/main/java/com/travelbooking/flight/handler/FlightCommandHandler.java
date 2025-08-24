@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
@@ -37,10 +36,9 @@ public class FlightCommandHandler {
     @KafkaListener(topics = Constants.Topics.FLIGHT_SERVICE_COMMANDS, groupId = Constants.ConsumerGroups.FLIGHT_SERVICE_GROUP)
     public void handleBookFlightCommand(Message<String> message) {
         try {
-            String correlationId = getCorrelationId(message);
-            logger.info("Received book flight command with correlation ID: {}", correlationId);
-
             BookFlightCommand command = objectMapper.readValue(message.getPayload(), BookFlightCommand.class);
+            String correlationId = command.correlationId().toString();
+            logger.info("Received book flight command with correlation ID: {}", correlationId);
             logger.debug("Processing flight booking command: {}", command);
 
             FlightBooking booking = flightBookingService.bookFlight(command);
@@ -64,17 +62,8 @@ public class FlightCommandHandler {
             logger.info("Flight booked event published for correlation ID: {}", correlationId);
 
         } catch (Exception e) {
-            String correlationId = getCorrelationId(message);
-            logger.error("Error processing book flight command for correlation ID: {}", correlationId, e);
+            logger.error("Error processing book flight command", e);
             throw new RuntimeException("Failed to process book flight command", e);
         }
-    }
-
-    private String getCorrelationId(Message<String> message) {
-        Object correlationIdHeader = message.getHeaders().get(KafkaHeaders.CORRELATION_ID);
-        if (correlationIdHeader != null) {
-            return correlationIdHeader.toString();
-        }
-        return "unknown";
     }
 }
