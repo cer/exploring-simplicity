@@ -5,21 +5,19 @@ import com.travelbooking.car.domain.CarRentalRepository;
 import com.travelbooking.car.messaging.messages.CarRentedEvent;
 import com.travelbooking.car.messaging.messages.RentCarCommand;
 import com.travelbooking.common.Constants;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.serialization.StringDeserializer;
+import com.travelbooking.testutils.kafka.TestConsumer;
+import com.travelbooking.testutils.kafka.TestConsumerConfiguration;
+import com.travelbooking.testutils.kafka.TestSubscription;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -32,8 +30,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +43,12 @@ import static org.awaitility.Awaitility.await;
                brokerProperties = {"listeners=PLAINTEXT://localhost:0", "port=0"})
 @DirtiesContext
 class CarRentalServiceIntegrationTest {
+
+  @TestConfiguration
+    @Import(TestConsumerConfiguration.class)
+    static class TestConfig {
+    }
+
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
@@ -71,27 +73,19 @@ class CarRentalServiceIntegrationTest {
     @Autowired
     private EmbeddedKafkaBroker embeddedKafka;
     
-    private KafkaConsumer<String, CarRentedEvent> consumer;
+    @Autowired
+    private TestConsumer testConsumer;
+
+    private TestSubscription<String, CarRentedEvent> subscription;
 
     @BeforeEach
     void setUp() {
-        // Create consumer with a consistent group name
-        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("car-rental-integration-test", "false", embeddedKafka);
-        consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "com.travelbooking.*");
-        consumerProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, CarRentedEvent.class);
-        
-        consumer = new KafkaConsumer<>(consumerProps);
-        consumer.subscribe(Collections.singletonList(Constants.Topics.CAR_SERVICE_REPLIES));
+      subscription = testConsumer.subscribeForJSon(Constants.Topics.CAR_SERVICE_REPLIES, CarRentedEvent.class);
     }
     
     @AfterEach
     void tearDown() {
-        if (consumer != null) {
-            consumer.close();
-        }
+        TestSubscription.closeQuietly(subscription);
     }
 
     @Test
@@ -116,30 +110,18 @@ class CarRentalServiceIntegrationTest {
         kafkaTemplate.send(Constants.Topics.CAR_SERVICE_COMMANDS, correlationId, command);
 
         // Then - Wait for and verify the reply event
-        await().atMost(Duration.ofSeconds(10))
-            .untilAsserted(() -> {
-                ConsumerRecords<String, CarRentedEvent> records = consumer.poll(Duration.ofMillis(100));
-                
-                // Find the record with matching correlation ID
-                ConsumerRecord<String, CarRentedEvent> targetRecord = null;
-                for (ConsumerRecord<String, CarRentedEvent> record : records) {
-                    if (correlationId.equals(record.key())) {
-                        targetRecord = record;
-                        break;
-                    }
-                }
-                
-                assertThat(targetRecord).isNotNull();
-                
-                CarRentedEvent event = targetRecord.value();
-                assertThat(event).isNotNull();
-                assertThat(event.correlationId()).isEqualTo(correlationId);
-                assertThat(event.rentalId()).isNotBlank();
-                assertThat(event.confirmationNumber()).startsWith("CR");
-                assertThat(event.totalPrice()).isGreaterThan(BigDecimal.ZERO);
-                // COMPACT for 5 days at $45/day = $225
-                assertThat(event.totalPrice()).isEqualTo(new BigDecimal("225.00"));
-            });
+
+        subscription.assertRecordReceived(record -> {
+          CarRentedEvent event = record.value();
+          assertThat(event).isNotNull();
+          assertThat(event.correlationId()).isEqualTo(correlationId);
+          assertThat(event.rentalId()).isNotBlank();
+          assertThat(event.confirmationNumber()).startsWith("CR");
+          assertThat(event.totalPrice()).isGreaterThan(BigDecimal.ZERO);
+          // COMPACT for 5 days at $45/day = $225
+          assertThat(event.totalPrice()).isEqualTo(new BigDecimal("225.00"));
+
+        });
 
         // Also verify database state
         await().atMost(Duration.ofSeconds(5))
@@ -182,28 +164,16 @@ class CarRentalServiceIntegrationTest {
         kafkaTemplate.send(Constants.Topics.CAR_SERVICE_COMMANDS, correlationId, luxuryCommand);
 
         // Then - Verify reply event with correct pricing
-        await().atMost(Duration.ofSeconds(10))
-            .untilAsserted(() -> {
-                ConsumerRecords<String, CarRentedEvent> records = consumer.poll(Duration.ofMillis(100));
-                
-                // Find the record with matching correlation ID
-                ConsumerRecord<String, CarRentedEvent> targetRecord = null;
-                for (ConsumerRecord<String, CarRentedEvent> record : records) {
-                    if (correlationId.equals(record.key())) {
-                        targetRecord = record;
-                        break;
-                    }
-                }
-                
-                assertThat(targetRecord).isNotNull();
-                
-                CarRentedEvent event = targetRecord.value();
-                assertThat(event).isNotNull();
-                assertThat(event.correlationId()).isEqualTo(correlationId);
-                // LUXURY at $150/day for 2 days = $300
-                assertThat(event.totalPrice()).isEqualTo(new BigDecimal("300.00"));
-            });
-        
+
+        subscription.assertRecordReceived(record -> {
+          CarRentedEvent event = record.value();
+          assertThat(event).isNotNull();
+          assertThat(event.correlationId()).isEqualTo(correlationId);
+          // LUXURY at $150/day for 2 days = $300
+          assertThat(event.totalPrice()).isEqualTo(new BigDecimal("300.00"));
+
+        });
+
         // Also verify in database
         await().atMost(Duration.ofSeconds(5))
             .untilAsserted(() -> {
@@ -241,27 +211,15 @@ class CarRentalServiceIntegrationTest {
         kafkaTemplate.send(Constants.Topics.CAR_SERVICE_COMMANDS, correlationId, command);
 
         // Then - Verify Kafka reply
-        await().atMost(Duration.ofSeconds(10))
-            .untilAsserted(() -> {
-                ConsumerRecords<String, CarRentedEvent> records = consumer.poll(Duration.ofMillis(100));
-                
-                // Find the record with matching correlation ID
-                ConsumerRecord<String, CarRentedEvent> targetRecord = null;
-                for (ConsumerRecord<String, CarRentedEvent> record : records) {
-                    if (correlationId.equals(record.key())) {
-                        targetRecord = record;
-                        break;
-                    }
-                }
-                
-                assertThat(targetRecord).isNotNull();
-                
-                CarRentedEvent event = targetRecord.value();
-                assertThat(event.correlationId()).isEqualTo(correlationId);
-                // SUV at $95/day for 3 days = $285
-                assertThat(event.totalPrice()).isEqualTo(new BigDecimal("285.00"));
-            });
-        
+
+        subscription.assertRecordReceived(record -> {
+          CarRentedEvent event = record.value();
+          assertThat(event.correlationId()).isEqualTo(correlationId);
+          // SUV at $95/day for 3 days = $285
+          assertThat(event.totalPrice()).isEqualTo(new BigDecimal("285.00"));
+
+        });
+
         // Verify persistence in PostgreSQL
         await().atMost(Duration.ofSeconds(5))
             .untilAsserted(() -> {

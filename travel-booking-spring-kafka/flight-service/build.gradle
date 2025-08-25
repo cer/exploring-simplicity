@@ -2,4 +2,5 @@ apply plugin: 'IntegrationTestsPlugin'
 
 dependencies {
     implementation project(':common')
+    integrationTestImplementation project(':test-utils')
 }

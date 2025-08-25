@@ -2,24 +2,22 @@ package com.travelbooking.flight;
 
 import com.travelbooking.common.Constants;
 import com.travelbooking.flight.domain.FlightBooking;
-import com.travelbooking.flight.repository.FlightBookingRepository;
 import com.travelbooking.flight.domain.Traveler;
+import com.travelbooking.flight.repository.FlightBookingRepository;
 import com.travelbooking.flight.repository.TravelerRepository;
-import com.travelbooking.flight.messaging.BookFlightCommand;
-import com.travelbooking.flight.messaging.FlightBookedEvent;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
+import com.travelbooking.testutils.kafka.TestConsumer;
+import com.travelbooking.testutils.kafka.TestConsumerConfiguration;
+import com.travelbooking.testutils.kafka.TestSubscription;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
@@ -33,7 +31,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,6 +54,11 @@ import static org.awaitility.Awaitility.await;
 @DirtiesContext
 public class FlightServiceIntegrationTest {
 
+    @TestConfiguration
+    @Import(TestConsumerConfiguration.class)
+    static class TestConfig {
+    }
+
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
             .withDatabaseName("flightdb")
@@ -70,8 +74,11 @@ public class FlightServiceIntegrationTest {
     @Autowired
     private TravelerRepository travelerRepository;
 
+    @Autowired
+    private TestConsumer testConsumer;
+
     private Producer<String, String> producer;
-    private Consumer<String, String> consumer;
+    private TestSubscription<String, String> subscription;
 
     @BeforeEach
     void setUp() {
@@ -81,13 +88,7 @@ public class FlightServiceIntegrationTest {
                 .createProducer();
 
         // Set up Kafka consumer with unique group ID
-        String uniqueGroupId = "test-group-" + UUID.randomUUID();
-        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps(uniqueGroupId, "true", embeddedKafkaBroker);
-        consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        consumerProps.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 10);
-        consumer = new DefaultKafkaConsumerFactory<>(consumerProps, new StringDeserializer(), new StringDeserializer())
-                .createConsumer();
-        consumer.subscribe(Collections.singletonList(Constants.Topics.FLIGHT_SERVICE_REPLIES));
+        subscription = testConsumer.subscribe(Constants.Topics.FLIGHT_SERVICE_REPLIES);
 
         // Clean up database
         flightBookingRepository.deleteAll();
@@ -96,9 +97,7 @@ public class FlightServiceIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        if (consumer != null) {
-            consumer.close();
-        }
+        TestSubscription.closeQuietly(subscription);
         if (producer != null) {
             producer.close();
         }
@@ -109,7 +108,7 @@ public class FlightServiceIntegrationTest {
         // Given
         String correlationId = UUID.randomUUID().toString();
         String travelerId = UUID.randomUUID().toString();
-        
+
         String commandJson = String.format("""
             {
                 "correlationId": "%s",
@@ -157,36 +156,26 @@ public class FlightServiceIntegrationTest {
         assertThat(booking.get().getPrice()).isEqualTo(new BigDecimal("650.00"));
 
         // Verify the event was published - wait for the specific message with our correlation ID
-        await().atMost(Duration.ofSeconds(10))
-                .untilAsserted(() -> {
-                    ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-                    boolean foundExpectedRecord = false;
-                    
-                    for (var record : records) {
-                        if (correlationId.equals(record.key())) {
-                            foundExpectedRecord = true;
-                            assertThat(record.value()).contains("\"correlationId\":\"" + correlationId + "\"");
-                            assertThat(record.value()).contains("\"confirmationNumber\":\"FL-");
-                            assertThat(record.value()).contains("\"bookingId\":");
-                            assertThat(record.value()).contains("\"price\":");
-                            break;
-                        }
-                    }
-                    
-                    assertThat(foundExpectedRecord).as("Should find record with correlationId: " + correlationId).isTrue();
-                });
+        subscription.assertRecordReceived(record -> {
+            assertThat(record.value()).contains("\"correlationId\":\"" + correlationId + "\"");
+            assertThat(record.value()).contains("\"confirmationNumber\":\"FL-");
+            assertThat(record.value()).contains("\"bookingId\":");
+            assertThat(record.value()).contains("\"price\":");
+        });
     }
 
     @Test
-    void shouldHandleMultipleBookingCommands() throws Exception {
+    void shouldHandleMultipleBookingCommands() {
         // Given
         int numberOfBookings = 5;
-        
+
+        List<String> correlationIds = new ArrayList<>();
+
         // When - Send multiple booking commands
         for (int i = 0; i < numberOfBookings; i++) {
             String correlationId = UUID.randomUUID().toString();
             String travelerId = UUID.randomUUID().toString();
-            
+
             String commandJson = String.format("""
                 {
                     "correlationId": "%s",
@@ -207,7 +196,7 @@ public class FlightServiceIntegrationTest {
                 LocalDate.now().plusDays(30),
                 LocalDate.now().plusDays(37)
             );
-
+            correlationIds.add(correlationId);
             producer.send(new ProducerRecord<>(Constants.Topics.FLIGHT_SERVICE_COMMANDS, correlationId, commandJson));
         }
 
@@ -219,13 +208,11 @@ public class FlightServiceIntegrationTest {
         assertThat(travelerRepository.count()).isEqualTo(numberOfBookings);
 
         // Verify all events are published
-        int totalEvents = 0;
-        long startTime = System.currentTimeMillis();
-        while (totalEvents < numberOfBookings && (System.currentTimeMillis() - startTime) < 10000) {
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-            totalEvents += records.count();
-        }
-        assertThat(totalEvents).isEqualTo(numberOfBookings);
+        subscription.assertRecordReceived(record -> {
+            correlationIds.remove(record.key());
+            System.out.println("correlationIds remaining: " + correlationIds);
+            assertThat(correlationIds).isEmpty();
+        });
     }
 
     @Test
@@ -235,7 +222,7 @@ public class FlightServiceIntegrationTest {
         String travelerId = UUID.randomUUID().toString();
         LocalDate departureDate = LocalDate.now().plusDays(30);
         LocalDate returnDate = LocalDate.now().plusDays(37);
-        
+
         String commandJson = String.format("""
             {
                 "correlationId": "%s",
@@ -274,7 +261,7 @@ public class FlightServiceIntegrationTest {
         // Given
         String correlationId = UUID.randomUUID().toString();
         String travelerId = UUID.randomUUID().toString();
-        
+
         String commandJson = String.format("""
             {
                 "correlationId": "%s",

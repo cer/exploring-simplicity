@@ -2,8 +2,9 @@ apply plugin: com.travelbooking.plugins.IntegrationTestsPlugin
 
 dependencies {
     implementation project(':common')
-    
-    // Add testcontainers dependencies for integration tests
+
+    integrationTestImplementation project(':test-utils')
+
     integrationTestImplementation 'org.testcontainers:testcontainers'
     integrationTestImplementation 'org.testcontainers:junit-jupiter'
     integrationTestImplementation 'org.testcontainers:postgresql'
