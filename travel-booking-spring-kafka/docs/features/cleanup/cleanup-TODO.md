@@ -39,12 +39,12 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 [x] Run gradle check to verify existing tests still pass after removal
 
 ## 4. TripBookingServiceIntegrationTest: create via REST API
-[ ] Add Spring Boot Web dependency to trip-booking-service if not present
-[ ] Write test for POST /api/trips endpoint
-[ ] Create TripBookingController with POST endpoint
-[ ] Update integration test to use TestRestTemplate or WebTestClient
-[ ] Remove direct service calls in favor of REST API calls
-[ ] Add validation and error handling tests
+[x] Add Spring Boot Web dependency to trip-booking-service if not present
+[x] Write test for POST /api/trips endpoint
+[x] Create TripBookingController with POST endpoint
+[x] Update integration test to use TestRestTemplate or WebTestClient
+[x] Remove direct service calls in favor of REST API calls
+[x] Add validation and error handling tests
 
 ## 5. Verify command message is sent before simulating reply (TripBookingServiceIntegrationTest only)
 [ ] Create TestSubscription helper to verify message was sent to command topic

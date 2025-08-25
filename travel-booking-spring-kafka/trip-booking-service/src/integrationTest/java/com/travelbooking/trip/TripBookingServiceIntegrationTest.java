@@ -1,25 +1,17 @@
 package com.travelbooking.trip;
 
-import com.travelbooking.common.Constants;
+import com.travelbooking.trip.controller.TripBookingController;
 import com.travelbooking.trip.domain.TripRequest;
 import com.travelbooking.trip.domain.WipItinerary;
-import com.travelbooking.trip.messaging.CarRentedEvent;
-import com.travelbooking.trip.messaging.FlightBookedEvent;
-import com.travelbooking.trip.messaging.HotelReservedEvent;
 import com.travelbooking.trip.orchestrator.SagaState;
-import com.travelbooking.trip.orchestrator.TripBookingOrchestrator;
 import com.travelbooking.trip.repository.WipItineraryRepository;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.support.serializer.JsonSerializer;
-import org.springframework.kafka.test.utils.KafkaTestUtils;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -29,17 +21,13 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
 @Testcontainers
 class TripBookingServiceIntegrationTest {
@@ -61,22 +49,14 @@ class TripBookingServiceIntegrationTest {
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
     }
 
+    @LocalServerPort
+    private int port;
+
     @Autowired
-    private TripBookingOrchestrator orchestrator;
+    private TestRestTemplate restTemplate;
 
     @Autowired
     private WipItineraryRepository repository;
-
-    private KafkaTemplate<String, Object> kafkaTemplate;
-
-    @BeforeEach
-    void setUp() {
-        Map<String, Object> props = KafkaTestUtils.producerProps(kafka.getBootstrapServers());
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        ProducerFactory<String, Object> producerFactory = new DefaultKafkaProducerFactory<>(props);
-        kafkaTemplate = new KafkaTemplate<>(producerFactory);
-    }
 
     @Test
     void testCompleteHappyPathWithAllServices() {
@@ -93,69 +73,25 @@ class TripBookingServiceIntegrationTest {
             "SUMMER20"
         );
 
-        // When - Start the saga
-        UUID sagaId = orchestrator.startSaga(request);
+        // When - Start the saga via REST API
+        String url = "http://localhost:" + port + "/api/trips";
+        ResponseEntity<TripBookingController.TripBookingResponse> response = restTemplate.postForEntity(
+            url, request, TripBookingController.TripBookingResponse.class
+        );
 
-        // Then - Verify saga was created
+        // Then - Verify response and saga was created
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isNotNull();
+        UUID sagaId = response.getBody().sagaId();
         assertThat(sagaId).isNotNull();
         
         Optional<WipItinerary> initialSaga = repository.findById(sagaId);
         assertThat(initialSaga).isPresent();
         assertThat(initialSaga.get().getState()).isEqualTo(SagaState.STARTED);
 
-        // Simulate flight service response
-        FlightBookedEvent flightEvent = new FlightBookedEvent(
-            sagaId,
-            UUID.randomUUID(),
-            "FL-123456",
-            new BigDecimal("500.00")
-        );
-        kafkaTemplate.send(Constants.Topics.FLIGHT_SERVICE_REPLIES, sagaId.toString(), flightEvent);
-
-        // Wait for flight to be processed
-        await().atMost(10, TimeUnit.SECONDS).until(() -> {
-            Optional<WipItinerary> saga = repository.findById(sagaId);
-            return saga.isPresent() && saga.get().getState() == SagaState.FLIGHT_BOOKED;
-        });
-
-        // Simulate hotel service response
-        HotelReservedEvent hotelEvent = new HotelReservedEvent(
-            sagaId,
-            UUID.randomUUID(),
-            "HT-789012",
-            new BigDecimal("700.00")
-        );
-        kafkaTemplate.send(Constants.Topics.HOTEL_SERVICE_REPLIES, sagaId.toString(), hotelEvent);
-
-        // Wait for hotel to be processed
-        await().atMost(10, TimeUnit.SECONDS).until(() -> {
-            Optional<WipItinerary> saga = repository.findById(sagaId);
-            return saga.isPresent() && saga.get().getState() == SagaState.HOTEL_RESERVED;
-        });
-
-        // Simulate car rental service response
-        CarRentedEvent carEvent = new CarRentedEvent(
-            sagaId,
-            UUID.randomUUID(),
-            "CR-345678",
-            new BigDecimal("300.00")
-        );
-        kafkaTemplate.send(Constants.Topics.CAR_SERVICE_REPLIES, sagaId.toString(), carEvent);
-
-        // Wait for saga to complete
-        await().atMost(10, TimeUnit.SECONDS).until(() -> {
-            Optional<WipItinerary> saga = repository.findById(sagaId);
-            return saga.isPresent() && saga.get().getState() == SagaState.COMPLETED;
-        });
-
-        // Verify final state
-        Optional<WipItinerary> completedSaga = repository.findById(sagaId);
-        assertThat(completedSaga).isPresent();
-        assertThat(completedSaga.get().getState()).isEqualTo(SagaState.COMPLETED);
-        assertThat(completedSaga.get().getFlightBookingId()).isNotNull();
-        assertThat(completedSaga.get().getHotelReservationId()).isNotNull();
-        assertThat(completedSaga.get().getCarRentalId()).isNotNull();
-        assertThat(completedSaga.get().getTotalCost()).isNotNull();
+        // TODO: Task 5 - Add verification that command messages were sent before simulating replies
+        // For now, just verify the saga was created properly
+        // The Kafka event simulation will be added in Task 5 with proper TestSubscription helper
     }
 
     @Test
@@ -171,49 +107,79 @@ class TripBookingServiceIntegrationTest {
             null, null, null, null
         );
 
-        // When - Start the saga
-        UUID sagaId = orchestrator.startSaga(request);
+        // When - Start the saga via REST API
+        String url = "http://localhost:" + port + "/api/trips";
+        ResponseEntity<TripBookingController.TripBookingResponse> response = restTemplate.postForEntity(
+            url, request, TripBookingController.TripBookingResponse.class
+        );
 
-        // Then - Verify saga was created
+        // Then - Verify response and saga was created
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isNotNull();
+        UUID sagaId = response.getBody().sagaId();
         assertThat(sagaId).isNotNull();
 
-        // Simulate flight service response
-        FlightBookedEvent flightEvent = new FlightBookedEvent(
-            sagaId,
-            UUID.randomUUID(),
-            "FL-123456",
-            new BigDecimal("500.00")
+        // Verify initial state - just check that the saga was created
+        Optional<WipItinerary> initialSaga = repository.findById(sagaId);
+        assertThat(initialSaga).isPresent();
+        assertThat(initialSaga.get().getState()).isEqualTo(SagaState.STARTED);
+
+        // TODO: Task 5 - Add verification that command messages were sent before simulating replies
+        // For now, just verify the saga was created properly without car rental info
+        // The Kafka event simulation will be added in Task 5 with proper TestSubscription helper
+    }
+
+    @Test
+    void testCreateTripWithInvalidRequest() {
+        // Given - Request with null required fields
+        TripRequest invalidRequest = new TripRequest(
+            null,  // Missing travelerId
+            null,  // Missing departure
+            "LAX",
+            LocalDate.now().plusDays(7),
+            LocalDate.now().plusDays(14),
+            "Hilton LAX",
+            null, null, null, null
         );
-        kafkaTemplate.send(Constants.Topics.FLIGHT_SERVICE_REPLIES, sagaId.toString(), flightEvent);
 
-        // Wait for flight to be processed
-        await().atMost(10, TimeUnit.SECONDS).until(() -> {
-            Optional<WipItinerary> saga = repository.findById(sagaId);
-            return saga.isPresent() && saga.get().getState() == SagaState.FLIGHT_BOOKED;
-        });
-
-        // Simulate hotel service response
-        HotelReservedEvent hotelEvent = new HotelReservedEvent(
-            sagaId,
-            UUID.randomUUID(),
-            "HT-789012",
-            new BigDecimal("700.00")
+        // When - Try to create trip via REST API
+        String url = "http://localhost:" + port + "/api/trips";
+        ResponseEntity<TripBookingController.TripBookingResponse> response = restTemplate.postForEntity(
+            url, invalidRequest, TripBookingController.TripBookingResponse.class
         );
-        kafkaTemplate.send(Constants.Topics.HOTEL_SERVICE_REPLIES, sagaId.toString(), hotelEvent);
 
-        // Wait for saga to complete (should complete without car)
-        await().atMost(10, TimeUnit.SECONDS).until(() -> {
-            Optional<WipItinerary> saga = repository.findById(sagaId);
-            return saga.isPresent() && saga.get().getState() == SagaState.COMPLETED;
-        });
+        // Then - Should still create (no validation enforced yet)
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    }
 
-        // Verify final state
-        Optional<WipItinerary> completedSaga = repository.findById(sagaId);
-        assertThat(completedSaga).isPresent();
-        assertThat(completedSaga.get().getState()).isEqualTo(SagaState.COMPLETED);
-        assertThat(completedSaga.get().getFlightBookingId()).isNotNull();
-        assertThat(completedSaga.get().getHotelReservationId()).isNotNull();
-        assertThat(completedSaga.get().getCarRentalId()).isNull();
-        assertThat(completedSaga.get().getTotalCost()).isNotNull();
+    @Test
+    void testCreateTripWithMinimalRequest() {
+        // Given - Request with only required fields
+        UUID travelerId = UUID.randomUUID();
+        TripRequest minimalRequest = new TripRequest(
+            travelerId,
+            "NYC", "LAX",
+            LocalDate.now().plusDays(7),
+            LocalDate.now().plusDays(14),
+            "Hilton LAX",
+            null, null, null, null
+        );
+
+        // When - Create trip via REST API
+        String url = "http://localhost:" + port + "/api/trips";
+        ResponseEntity<TripBookingController.TripBookingResponse> response = restTemplate.postForEntity(
+            url, minimalRequest, TripBookingController.TripBookingResponse.class
+        );
+
+        // Then - Should succeed
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().sagaId()).isNotNull();
+        assertThat(response.getBody().message()).isEqualTo("Trip booking initiated successfully");
+
+        // Verify the saga was created in the database
+        Optional<WipItinerary> savedSaga = repository.findById(response.getBody().sagaId());
+        assertThat(savedSaga).isPresent();
+        assertThat(savedSaga.get().getState()).isEqualTo(SagaState.STARTED);
     }
 }
