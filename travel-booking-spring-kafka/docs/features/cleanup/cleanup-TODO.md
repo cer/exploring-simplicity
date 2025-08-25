@@ -102,6 +102,6 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 [ ] Update TripBookingOrchestrator.handleHotelReserved() to use noteHotelReserved(hotelReservationId, totalCost) and remove completeSaga() call
 [ ] Update TripBookingOrchestrator.handleCarRented() to use noteCarRented(carRentalId, totalCost) and remove completeSaga() call
 [ ] Remove TripBookingOrchestrator.completeSaga() method entirely
-[ ] Make setState(), setFlightBookingId(), setHotelReservationId(), setCarRentalId(), and setTotalCost() private
+[ ] Remove setState(), setFlightBookingId(), setHotelReservationId(), setCarRentalId(), and setTotalCost() methods (domain methods will access fields directly)
 [ ] Run gradle check
 [ ] Commit changes
