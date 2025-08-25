@@ -17,8 +17,6 @@ public class WipItinerary {
     @Column(nullable = false)
     private SagaState state;
     
-    @Column(nullable = false)
-    private UUID travelerId;
     
     private UUID flightBookingId;
     
@@ -47,18 +45,9 @@ public class WipItinerary {
     protected WipItinerary() {
     }
     
-    public WipItinerary(UUID sagaId, UUID travelerId) {
-        this.sagaId = sagaId;
-        this.state = SagaState.STARTED;
-        this.travelerId = travelerId;
-        this.createdAt = LocalDateTime.now();
-        this.lastModifiedAt = LocalDateTime.now();
-    }
-    
     public WipItinerary(UUID sagaId, TripRequest tripRequest) {
         this.sagaId = sagaId;
         this.state = SagaState.STARTED;
-        this.travelerId = tripRequest.travelerId();
         this.tripRequest = tripRequest;
         this.createdAt = LocalDateTime.now();
         this.lastModifiedAt = LocalDateTime.now();
@@ -82,7 +71,7 @@ public class WipItinerary {
     }
     
     public UUID getTravelerId() {
-        return travelerId;
+        return tripRequest != null ? tripRequest.travelerId() : null;
     }
     
     public UUID getFlightBookingId() {
@@ -131,9 +120,5 @@ public class WipItinerary {
     
     public TripRequest getTripRequest() {
         return tripRequest;
-    }
-    
-    public void setTripRequest(TripRequest tripRequest) {
-        this.tripRequest = tripRequest;
     }
 }

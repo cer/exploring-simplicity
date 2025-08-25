@@ -1,5 +1,6 @@
 package com.travelbooking.trip.repository;
 
+import com.travelbooking.trip.domain.TripRequest;
 import com.travelbooking.trip.domain.WipItinerary;
 import com.travelbooking.trip.orchestrator.SagaState;
 import org.junit.jupiter.api.Test;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,11 +23,25 @@ class WipItineraryRepositoryTest {
     @Autowired
     private WipItineraryRepository repository;
 
+    private TripRequest createTripRequest(UUID travelerId) {
+        return new TripRequest(
+            travelerId,
+            "NYC", "LAX",
+            LocalDate.now().plusDays(7),
+            LocalDate.now().plusDays(14),
+            "Hilton LAX",
+            "LAX Airport", "LAX Airport",
+            "SEDAN",
+            "SUMMER20"
+        );
+    }
+
     @Test
     void testSaveAndFindById() {
         UUID sagaId = UUID.randomUUID();
         UUID travelerId = UUID.randomUUID();
-        WipItinerary wipItinerary = new WipItinerary(sagaId, travelerId);
+        TripRequest tripRequest = createTripRequest(travelerId);
+        WipItinerary wipItinerary = new WipItinerary(sagaId, tripRequest);
         
         WipItinerary saved = repository.save(wipItinerary);
         entityManager.flush();
@@ -52,7 +68,8 @@ class WipItineraryRepositoryTest {
     void testUpdateSagaState() {
         UUID sagaId = UUID.randomUUID();
         UUID travelerId = UUID.randomUUID();
-        WipItinerary wipItinerary = new WipItinerary(sagaId, travelerId);
+        TripRequest tripRequest = createTripRequest(travelerId);
+        WipItinerary wipItinerary = new WipItinerary(sagaId, tripRequest);
         repository.save(wipItinerary);
         entityManager.flush();
         entityManager.clear();

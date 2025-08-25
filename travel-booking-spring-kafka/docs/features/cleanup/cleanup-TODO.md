@@ -87,9 +87,9 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 [ ] Commit changes
 
 ## 7. Clean up WipItinerary redundant constructor and field
-[ ] Remove WipItinerary(UUID sagaId, UUID travelerId) constructor
-[ ] Remove travelerId field from WipItinerary (it's available in the TripRequest)
-[ ] Update getTravelerId() method to return tripRequest.travelerId()
-[ ] Update any tests that use the old constructor
-[ ] Run gradle check
-[ ] Commit changes
+[x] Remove WipItinerary(UUID sagaId, UUID travelerId) constructor
+[x] Remove travelerId field from WipItinerary (it's available in the TripRequest)
+[x] Update getTravelerId() method to return tripRequest.travelerId()
+[x] Update any tests that use the old constructor
+[x] Run gradle check
+[x] Commit changes

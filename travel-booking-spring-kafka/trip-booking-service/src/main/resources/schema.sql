@@ -1,13 +1,12 @@
 CREATE TABLE IF NOT EXISTS wip_itinerary (
     saga_id UUID PRIMARY KEY,
     state VARCHAR(50) NOT NULL,
-    traveler_id UUID NOT NULL,
     flight_booking_id UUID,
     hotel_reservation_id UUID,
     car_rental_id UUID,
     total_cost DECIMAL(10, 2),
     -- TripRequest embedded fields
-    trip_traveler_id UUID,
+    trip_traveler_id UUID NOT NULL,
     from_location VARCHAR(255),
     to_location VARCHAR(255),
     departure_date DATE,
@@ -23,4 +22,4 @@ CREATE TABLE IF NOT EXISTS wip_itinerary (
 );
 
 CREATE INDEX idx_wip_itinerary_state ON wip_itinerary(state);
-CREATE INDEX idx_wip_itinerary_traveler ON wip_itinerary(traveler_id);
+CREATE INDEX idx_wip_itinerary_traveler ON wip_itinerary(trip_traveler_id);

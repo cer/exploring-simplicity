@@ -10,12 +10,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class WipItineraryTest {
 
+    private TripRequest createTripRequest(UUID travelerId) {
+        return new TripRequest(
+            travelerId,
+            "NYC", "LAX",
+            LocalDate.now().plusDays(7),
+            LocalDate.now().plusDays(14),
+            "Hilton LAX",
+            "LAX Airport", "LAX Airport",
+            "SEDAN",
+            "SUMMER20"
+        );
+    }
+
     @Test
     void testWipItineraryCreation() {
         UUID sagaId = UUID.randomUUID();
         UUID travelerId = UUID.randomUUID();
+        TripRequest tripRequest = createTripRequest(travelerId);
         
-        WipItinerary wipItinerary = new WipItinerary(sagaId, travelerId);
+        WipItinerary wipItinerary = new WipItinerary(sagaId, tripRequest);
         
         assertThat(wipItinerary.getSagaId()).isEqualTo(sagaId);
         assertThat(wipItinerary.getState()).isEqualTo(SagaState.STARTED);
@@ -30,7 +44,8 @@ class WipItineraryTest {
     
     @Test
     void testUpdateFlightBooking() {
-        WipItinerary wipItinerary = new WipItinerary(UUID.randomUUID(), UUID.randomUUID());
+        UUID travelerId = UUID.randomUUID();
+        WipItinerary wipItinerary = new WipItinerary(UUID.randomUUID(), createTripRequest(travelerId));
         UUID flightBookingId = UUID.randomUUID();
         
         wipItinerary.setFlightBookingId(flightBookingId);
@@ -42,7 +57,8 @@ class WipItineraryTest {
     
     @Test
     void testUpdateHotelReservation() {
-        WipItinerary wipItinerary = new WipItinerary(UUID.randomUUID(), UUID.randomUUID());
+        UUID travelerId = UUID.randomUUID();
+        WipItinerary wipItinerary = new WipItinerary(UUID.randomUUID(), createTripRequest(travelerId));
         UUID hotelReservationId = UUID.randomUUID();
         
         wipItinerary.setHotelReservationId(hotelReservationId);
@@ -54,7 +70,8 @@ class WipItineraryTest {
     
     @Test
     void testUpdateCarRental() {
-        WipItinerary wipItinerary = new WipItinerary(UUID.randomUUID(), UUID.randomUUID());
+        UUID travelerId = UUID.randomUUID();
+        WipItinerary wipItinerary = new WipItinerary(UUID.randomUUID(), createTripRequest(travelerId));
         UUID carRentalId = UUID.randomUUID();
         
         wipItinerary.setCarRentalId(carRentalId);
@@ -66,7 +83,8 @@ class WipItineraryTest {
     
     @Test
     void testCompleteSaga() {
-        WipItinerary wipItinerary = new WipItinerary(UUID.randomUUID(), UUID.randomUUID());
+        UUID travelerId = UUID.randomUUID();
+        WipItinerary wipItinerary = new WipItinerary(UUID.randomUUID(), createTripRequest(travelerId));
         BigDecimal totalCost = new BigDecimal("1500.00");
         
         wipItinerary.setState(SagaState.COMPLETED);
@@ -110,37 +128,4 @@ class WipItineraryTest {
         assertThat(wipItinerary.getTripRequest().includesCar()).isTrue();
     }
     
-    @Test
-    void testStoreTripRequest() {
-        UUID sagaId = UUID.randomUUID();
-        UUID travelerId = UUID.randomUUID();
-        WipItinerary wipItinerary = new WipItinerary(sagaId, travelerId);
-        
-        // Create and store trip request
-        TripRequest tripRequest = new TripRequest(
-            travelerId,
-            "NYC", "LAX",
-            LocalDate.now().plusDays(7),
-            LocalDate.now().plusDays(14),
-            "Hilton LAX",
-            "LAX Airport", "LAX Airport",
-            "SEDAN",
-            "SUMMER20"
-        );
-        
-        wipItinerary.setTripRequest(tripRequest);
-        
-        // Verify trip request is stored
-        assertThat(wipItinerary.getTripRequest()).isNotNull();
-        assertThat(wipItinerary.getTripRequest().from()).isEqualTo("NYC");
-        assertThat(wipItinerary.getTripRequest().to()).isEqualTo("LAX");
-        assertThat(wipItinerary.getTripRequest().departureDate()).isEqualTo(LocalDate.now().plusDays(7));
-        assertThat(wipItinerary.getTripRequest().returnDate()).isEqualTo(LocalDate.now().plusDays(14));
-        assertThat(wipItinerary.getTripRequest().hotelName()).isEqualTo("Hilton LAX");
-        assertThat(wipItinerary.getTripRequest().carPickupLocation()).isEqualTo("LAX Airport");
-        assertThat(wipItinerary.getTripRequest().carDropoffLocation()).isEqualTo("LAX Airport");
-        assertThat(wipItinerary.getTripRequest().carType()).isEqualTo("SEDAN");
-        assertThat(wipItinerary.getTripRequest().discountCode()).isEqualTo("SUMMER20");
-        assertThat(wipItinerary.getTripRequest().includesCar()).isTrue();
-    }
 }
