@@ -198,4 +198,29 @@ class WipItineraryTest {
         assertThat(wipItinerary.getTotalCost()).isEqualTo(flightPrice.add(hotelPrice));
     }
     
+    @Test
+    void testNoteCarRented() {
+        UUID sagaId = UUID.randomUUID();
+        UUID travelerId = UUID.randomUUID();
+        TripRequest tripRequest = createTripRequest(travelerId);
+        WipItinerary wipItinerary = new WipItinerary(sagaId, tripRequest);
+        
+        // First book flight and hotel
+        BigDecimal flightPrice = new BigDecimal("500.00");
+        wipItinerary.noteFlightBooked(UUID.randomUUID(), flightPrice);
+        
+        BigDecimal hotelPrice = new BigDecimal("700.00");
+        wipItinerary.noteHotelReserved(UUID.randomUUID(), hotelPrice);
+        
+        // Now rent car
+        UUID carRentalId = UUID.randomUUID();
+        BigDecimal carPrice = new BigDecimal("300.00");
+        
+        wipItinerary.noteCarRented(carRentalId, carPrice);
+        
+        assertThat(wipItinerary.getCarRentalId()).isEqualTo(carRentalId);
+        assertThat(wipItinerary.getState()).isEqualTo(SagaState.COMPLETED);
+        assertThat(wipItinerary.getTotalCost()).isEqualTo(flightPrice.add(hotelPrice).add(carPrice));
+    }
+    
 }

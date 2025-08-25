@@ -153,4 +153,10 @@ public class WipItinerary {
             this.totalCost = this.flightPrice.add(hotelPrice);
         }
     }
+    
+    public void noteCarRented(UUID carRentalId, BigDecimal carPrice) {
+        this.carRentalId = carRentalId;
+        this.state = SagaState.COMPLETED;
+        this.totalCost = this.flightPrice.add(this.hotelPrice).add(carPrice);
+    }
 }
