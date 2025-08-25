@@ -60,11 +60,16 @@ class DiscountServiceIntegrationTest {
         await().atMost(Duration.ofSeconds(10))
             .untilAsserted(() -> {
                 ConsumerRecords<String, DiscountQueryReply> records = consumer.poll(Duration.ofMillis(500));
-                assertThat(records).isNotEmpty();
                 
-                ConsumerRecord<String, DiscountQueryReply> record = records.iterator().next();
-                DiscountQueryReply reply = record.value();
+                DiscountQueryReply reply = null;
+                for (ConsumerRecord<String, DiscountQueryReply> record : records) {
+                    if (correlationId.equals(record.value().correlationId())) {
+                        reply = record.value();
+                        break;
+                    }
+                }
                 
+                assertThat(reply).isNotNull();
                 assertThat(reply.correlationId()).isEqualTo(correlationId);
                 assertThat(reply.found()).isTrue();
                 assertThat(reply.percentage()).isEqualTo(new BigDecimal("10.00"));
@@ -90,11 +95,16 @@ class DiscountServiceIntegrationTest {
         await().atMost(Duration.ofSeconds(10))
             .untilAsserted(() -> {
                 ConsumerRecords<String, DiscountQueryReply> records = consumer.poll(Duration.ofMillis(500));
-                assertThat(records).isNotEmpty();
                 
-                ConsumerRecord<String, DiscountQueryReply> record = records.iterator().next();
-                DiscountQueryReply reply = record.value();
+                DiscountQueryReply reply = null;
+                for (ConsumerRecord<String, DiscountQueryReply> record : records) {
+                    if (correlationId.equals(record.value().correlationId())) {
+                        reply = record.value();
+                        break;
+                    }
+                }
                 
+                assertThat(reply).isNotNull();
                 assertThat(reply.correlationId()).isEqualTo(correlationId);
                 assertThat(reply.found()).isFalse();
                 assertThat(reply.percentage()).isNull();
@@ -120,11 +130,16 @@ class DiscountServiceIntegrationTest {
         await().atMost(Duration.ofSeconds(10))
             .untilAsserted(() -> {
                 ConsumerRecords<String, DiscountQueryReply> records = consumer.poll(Duration.ofMillis(500));
-                assertThat(records).isNotEmpty();
                 
-                ConsumerRecord<String, DiscountQueryReply> record = records.iterator().next();
-                DiscountQueryReply reply = record.value();
+                DiscountQueryReply reply = null;
+                for (ConsumerRecord<String, DiscountQueryReply> record : records) {
+                    if (correlationId.equals(record.value().correlationId())) {
+                        reply = record.value();
+                        break;
+                    }
+                }
                 
+                assertThat(reply).isNotNull();
                 assertThat(reply.correlationId()).isEqualTo(correlationId);
                 assertThat(reply.found()).isTrue();
                 assertThat(reply.percentage()).isEqualTo(new BigDecimal("20.00"));

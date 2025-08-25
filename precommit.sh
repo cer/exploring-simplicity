@@ -30,6 +30,10 @@ for dir in travel-booking-pojo travel-booking-spring-kafka; do
         if has_uncommitted_changes "$dir"; then
             echo "Found uncommitted changes in $dir, running gradlew check..."
             cd "$ROOT_DIR/$dir"
+            if grep -r --include="*.java" "org\.junit\.jupiter\.api\.Disabled" .; then
+                echo "Error: Found usage of org.junit.jupiter.api.Disabled in Java files. DO NOT DISABLE tests"
+                exit 1
+            fi
             ./gradlew check
         else
             echo "No uncommitted changes in $dir, skipping checks"

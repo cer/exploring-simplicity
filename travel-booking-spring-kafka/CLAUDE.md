@@ -6,3 +6,4 @@
 - Don't add finders to repositories unless they are needed by the business logic
 - IMPORTANT do not disable pre-commit hooks
 - integration tests should be in src/integrationTests using (apply plugin: IntegrationTestsPlugin)
+- IMPORTANT do not disable tests
