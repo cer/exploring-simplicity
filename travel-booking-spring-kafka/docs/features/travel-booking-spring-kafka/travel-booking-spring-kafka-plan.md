@@ -247,30 +247,30 @@ Implement the Car Rental Service with basic rental logic (without discount integ
 
 Using TDD approach:
 
-[ ] Write test for CarRental entity
-[ ] Implement CarRental entity with all required fields (id, confirmationNumber, travelerId, pickupLocation, dropoffLocation, pickupDate, dropoffDate, carType, dailyRate, discount)
-[ ] Implement Discount as @Embeddable with null allowed
+[x] Write test for CarRental entity
+[x] Implement CarRental entity with all required fields (id, confirmationNumber, travelerId, pickupLocation, dropoffLocation, pickupDate, dropoffDate, carType, dailyRate, discount)
+[x] Implement Discount as @Embeddable with null allowed
 
-[ ] Write test for RentCarCommand record
-[ ] Implement RentCarCommand with correlationId, car details, and optional discountCode
-[ ] Write test for CarRentedEvent record
-[ ] Implement CarRentedEvent with rental details
+[x] Write test for RentCarCommand record
+[x] Implement RentCarCommand with correlationId, car details, and optional discountCode
+[x] Write test for CarRentedEvent record
+[x] Implement CarRentedEvent with rental details
 
-[ ] Write test for CarRentalService.rentCar() without discount
-[ ] Implement CarRental repository
-[ ] Implement CarRentalService basic rental logic
-[ ] Calculate daily rate based on car type
-[ ] Generate confirmation number
+[x] Write test for CarRentalService.rentCar() without discount
+[x] Implement CarRental repository
+[x] Implement CarRentalService basic rental logic
+[x] Calculate daily rate based on car type
+[x] Generate confirmation number
 
-[ ] Write test for CarCommandHandler Kafka listener
-[ ] Implement CarCommandHandler with @KafkaListener
-[ ] Write test for successful rental command processing (no discount)
-[ ] Implement command processing and event publishing
+[x] Write test for CarCommandHandler Kafka listener
+[x] Implement CarCommandHandler with @KafkaListener
+[x] Write test for successful rental command processing (no discount)
+[x] Implement command processing and event publishing
 
-[ ] Create database migration script
-[ ] Configure application.yml
-[ ] Write integration test for happy path
-[ ] Verify service processes basic rentals
+[x] Create database migration script
+[x] Configure application.yml
+[x] Write integration test for happy path
+[x] Verify service processes basic rentals
 
 The service should:
 - Listen on car-service-commands topic
