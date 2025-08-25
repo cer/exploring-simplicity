@@ -29,8 +29,8 @@
 [ ] Remove old constructor that takes travelerId
 
 ## 3. Remove unnecessary saving of JPA entities retrieved by repository.find()
-[x] Search for pattern: repository.findById() followed by repository.save()
-[x] Identify which services have this anti-pattern - Found in TripBookingOrchestrator
+Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't need explicit save() within @Transactional methods
+
 [ ] Remove repository.save() in handleFlightBooked() after modifying retrieved WipItinerary
 [ ] Remove repository.save() in handleHotelReserved() after modifying retrieved WipItinerary
 [ ] Remove repository.save() in handleCarRented() after modifying retrieved WipItinerary
