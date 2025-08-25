@@ -16,11 +16,11 @@
 ## 3. Remove unnecessary saving of JPA entities retrieved by repository.find()
 [x] Search for pattern: repository.findById() followed by repository.save()
 [x] Identify which services have this anti-pattern - Found in TripBookingOrchestrator
-[ ] Remove repository.save() at line 68 in TripBookingOrchestrator.handleFlightBooked()
-[ ] Remove repository.save() at line 90 in TripBookingOrchestrator.handleHotelReserved()
-[ ] Remove repository.save() at line 119 in TripBookingOrchestrator.handleCarRented()
-[ ] Remove repository.save() at line 133 in TripBookingOrchestrator.completeSaga()
-[ ] Keep repository.save() at line 43 (new entity creation - this one is needed)
+[ ] Remove repository.save() in handleFlightBooked() after modifying retrieved WipItinerary
+[ ] Remove repository.save() in handleHotelReserved() after modifying retrieved WipItinerary
+[ ] Remove repository.save() in handleCarRented() after modifying retrieved WipItinerary
+[ ] Remove repository.save() in completeSaga() after modifying retrieved WipItinerary
+[ ] Keep repository.save() in startSaga() (new entity creation - this one is needed)
 [ ] Run gradle check to verify existing tests still pass after removal
 
 ## 4. TripBookingServiceIntegrationTest: create via REST API
@@ -33,11 +33,11 @@
 
 ## 5. Verify command message is sent before simulating reply (TripBookingServiceIntegrationTest only)
 [ ] Create TestSubscription helper to verify message was sent to command topic
-[ ] Add verification in TripBookingServiceIntegrationTest.testCompleteHappyPathWithAllServices() before line 113 (verify flight command sent)
-[ ] Add verification in TripBookingServiceIntegrationTest.testCompleteHappyPathWithAllServices() before line 128 (verify hotel command sent)
-[ ] Add verification in TripBookingServiceIntegrationTest.testCompleteHappyPathWithAllServices() before line 143 (verify car command sent)
-[ ] Add verification in TripBookingServiceIntegrationTest.testHappyPathWithoutCarRental() before line 187 (verify flight command sent)
-[ ] Add verification in TripBookingServiceIntegrationTest.testHappyPathWithoutCarRental() before line 196 (verify hotel command sent)
+[ ] Add verification in testCompleteHappyPathWithAllServices() before simulating FlightBookedEvent
+[ ] Add verification in testCompleteHappyPathWithAllServices() before simulating HotelReservedEvent
+[ ] Add verification in testCompleteHappyPathWithAllServices() before simulating CarRentedEvent
+[ ] Add verification in testHappyPathWithoutCarRental() before simulating FlightBookedEvent
+[ ] Add verification in testHappyPathWithoutCarRental() before simulating HotelReservedEvent
 
 ## 6. Rename command reply classes from *Event to *Reply
 [ ] Rename FlightBookedEvent to FlightBookedReply
