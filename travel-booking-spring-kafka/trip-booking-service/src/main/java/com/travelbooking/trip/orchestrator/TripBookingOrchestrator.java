@@ -62,8 +62,7 @@ public class TripBookingOrchestrator {
         WipItinerary wipItinerary = repository.findById(sagaId)
             .orElseThrow(() -> new IllegalStateException("Saga not found: " + sagaId));
         
-        wipItinerary.setFlightBookingId(flightBookingId);
-        wipItinerary.setState(SagaState.FLIGHT_BOOKED);
+        wipItinerary.noteFlightBooked(flightBookingId, flightPrice);
         
         TripRequest originalRequest = wipItinerary.getTripRequest();
         
@@ -83,8 +82,7 @@ public class TripBookingOrchestrator {
         WipItinerary wipItinerary = repository.findById(sagaId)
             .orElseThrow(() -> new IllegalStateException("Saga not found: " + sagaId));
         
-        wipItinerary.setHotelReservationId(hotelReservationId);
-        wipItinerary.setState(SagaState.HOTEL_RESERVED);
+        wipItinerary.noteHotelReserved(hotelReservationId, hotelPrice);
         
         TripRequest originalRequest = wipItinerary.getTripRequest();
         
@@ -99,8 +97,6 @@ public class TripBookingOrchestrator {
                 originalRequest.carType(),
                 originalRequest.discountCode()
             );
-        } else {
-            completeSaga(sagaId, hotelPrice.add(getFlightPrice(sagaId)));
         }
     }
     
@@ -111,30 +107,6 @@ public class TripBookingOrchestrator {
         WipItinerary wipItinerary = repository.findById(sagaId)
             .orElseThrow(() -> new IllegalStateException("Saga not found: " + sagaId));
         
-        wipItinerary.setCarRentalId(carRentalId);
-        wipItinerary.setState(SagaState.CAR_RENTED);
-        
-        BigDecimal totalCost = carPrice.add(getHotelPrice(sagaId)).add(getFlightPrice(sagaId));
-        completeSaga(sagaId, totalCost);
-    }
-    
-    private void completeSaga(UUID sagaId, BigDecimal totalCost) {
-        logger.info("Completing saga {} with total cost {}", sagaId, totalCost);
-        
-        WipItinerary wipItinerary = repository.findById(sagaId)
-            .orElseThrow(() -> new IllegalStateException("Saga not found: " + sagaId));
-        
-        wipItinerary.setState(SagaState.COMPLETED);
-        wipItinerary.setTotalCost(totalCost);
-    }
-    
-    private BigDecimal getFlightPrice(UUID sagaId) {
-        // TODO: In a real implementation, retrieve this from the FlightBookedEvent or store it
-        return new BigDecimal("500.00");
-    }
-    
-    private BigDecimal getHotelPrice(UUID sagaId) {
-        // TODO: In a real implementation, retrieve this from the HotelReservedEvent or store it
-        return new BigDecimal("700.00");
+        wipItinerary.noteCarRented(carRentalId, carPrice);
     }
 }
