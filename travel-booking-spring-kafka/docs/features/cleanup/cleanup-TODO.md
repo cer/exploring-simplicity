@@ -103,6 +103,6 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 [ ] Update TripBookingOrchestrator.handleHotelReserved() to use noteHotelReserved()
 [ ] Update TripBookingOrchestrator.handleCarRented() to use noteCarRented()
 [ ] Update TripBookingOrchestrator.completeSaga() to use markCompleted()
-[ ] Consider making individual setters private after refactoring
+[ ] Make setState(), setFlightBookingId(), setHotelReservationId(), setCarRentalId(), and setTotalCost() private
 [ ] Run gradle check
 [ ] Commit changes
