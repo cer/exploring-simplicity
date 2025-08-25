@@ -94,17 +94,39 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 [x] Run gradle check
 [x] Commit changes
 
-## 8. Refactor WipItinerary to use domain methods instead of multiple setters
-[ ] Add flightPrice and hotelPrice fields to WipItinerary to store prices from events
-[ ] Add noteFlightBooked(UUID flightBookingId, BigDecimal flightPrice) method that sets ID, price, and state to FLIGHT_BOOKED
-[ ] Add noteHotelReserved(UUID hotelReservationId, BigDecimal hotelPrice) method that sets ID, price, and state (HOTEL_RESERVED if tripRequest.includesCar(), COMPLETED with calculated totalCost if not)
-[ ] Add noteCarRented(UUID carRentalId, BigDecimal carPrice) method that sets ID, state to COMPLETED, and calculates totalCost from stored prices
-[ ] Update TripBookingOrchestrator.handleFlightBooked() to use noteFlightBooked(flightBookingId, flightPrice)
-[ ] Update TripBookingOrchestrator.handleHotelReserved() to use noteHotelReserved(hotelReservationId, hotelPrice) and remove completeSaga() call
-[ ] Update TripBookingOrchestrator.handleCarRented() to use noteCarRented(carRentalId, carPrice) and remove completeSaga() call
-[ ] Remove TripBookingOrchestrator.completeSaga() method entirely
-[ ] Remove TripBookingOrchestrator.getFlightPrice() method
-[ ] Remove TripBookingOrchestrator.getHotelPrice() method
-[ ] Remove setState(), setFlightBookingId(), setHotelReservationId(), setCarRentalId(), and setTotalCost() methods (domain methods will access fields directly)
+## 8. Refactor WipItinerary to use domain methods instead of multiple setters (TDD)
+
+### 8.1 Add noteFlightBooked method
+[ ] Write test for noteFlightBooked(UUID flightBookingId, BigDecimal flightPrice) verifying it sets ID, price, and state to FLIGHT_BOOKED
+[ ] Add flightPrice field to WipItinerary
+[ ] Implement noteFlightBooked method to make test pass
+[ ] Run gradle check
+[ ] Commit changes
+
+### 8.2 Add noteHotelReserved method  
+[ ] Write test for noteHotelReserved with car required - should set hotelReservationId, hotelPrice, and state to HOTEL_RESERVED
+[ ] Write test for noteHotelReserved without car required - should set hotelReservationId, hotelPrice, state to COMPLETED, and calculate totalCost
+[ ] Add hotelPrice field to WipItinerary
+[ ] Implement noteHotelReserved method to make tests pass
+[ ] Run gradle check
+[ ] Commit changes
+
+### 8.3 Add noteCarRented method
+[ ] Write test for noteCarRented(UUID carRentalId, BigDecimal carPrice) verifying it sets ID, state to COMPLETED, and calculates totalCost
+[ ] Implement noteCarRented method to make test pass
+[ ] Run gradle check
+[ ] Commit changes
+
+### 8.4 Update TripBookingOrchestrator to use domain methods
+[ ] Update handleFlightBooked() to use noteFlightBooked(flightBookingId, flightPrice)
+[ ] Update handleHotelReserved() to use noteHotelReserved(hotelReservationId, hotelPrice)
+[ ] Update handleCarRented() to use noteCarRented(carRentalId, carPrice)
+[ ] Remove completeSaga() method
+[ ] Remove getFlightPrice() and getHotelPrice() placeholder methods
+[ ] Run gradle check
+[ ] Commit changes
+
+### 8.5 Remove unnecessary setter methods
+[ ] Remove setState(), setFlightBookingId(), setHotelReservationId(), setCarRentalId(), and setTotalCost() methods
 [ ] Run gradle check
 [ ] Commit changes
