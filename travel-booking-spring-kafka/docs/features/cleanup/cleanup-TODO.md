@@ -95,12 +95,12 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 [x] Commit changes
 
 ## 8. Refactor WipItinerary to use domain methods instead of multiple setters
-[ ] Add noteFlightBooked(UUID flightBookingId) method to WipItinerary that sets both ID and state
-[ ] Add noteHotelReserved(UUID hotelReservationId) method to WipItinerary that sets both ID and state
-[ ] Add noteCarRented(UUID carRentalId) method to WipItinerary that sets both ID and state
-[ ] Add markCompleted(BigDecimal totalCost) method to WipItinerary that sets both state and total cost
+[ ] Add noteFlightBooked(UUID flightBookingId) method to WipItinerary that sets both ID and state to FLIGHT_BOOKED
+[ ] Add noteHotelReserved(UUID hotelReservationId, boolean carRequired) method that sets ID and state (HOTEL_RESERVED if car required, COMPLETED if not)
+[ ] Add noteCarRented(UUID carRentalId) method to WipItinerary that sets both ID and state to CAR_RENTED
+[ ] Add markCompleted(BigDecimal totalCost) method to WipItinerary that sets state to COMPLETED and stores total cost
 [ ] Update TripBookingOrchestrator.handleFlightBooked() to use noteFlightBooked()
-[ ] Update TripBookingOrchestrator.handleHotelReserved() to use noteHotelReserved()
+[ ] Update TripBookingOrchestrator.handleHotelReserved() to use noteHotelReserved(id, originalRequest.includesCar())
 [ ] Update TripBookingOrchestrator.handleCarRented() to use noteCarRented()
 [ ] Update TripBookingOrchestrator.completeSaga() to use markCompleted()
 [ ] Make setState(), setFlightBookingId(), setHotelReservationId(), setCarRentalId(), and setTotalCost() private
