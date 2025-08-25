@@ -4,20 +4,16 @@ import com.travelbooking.hotel.domain.HotelReservation;
 import com.travelbooking.hotel.domain.HotelReservationRepository;
 import com.travelbooking.hotel.messaging.messages.HotelReservedEvent;
 import com.travelbooking.hotel.messaging.messages.ReserveHotelCommand;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.common.serialization.StringDeserializer;
+import com.travelbooking.testutils.kafka.TestConsumer;
+import com.travelbooking.testutils.kafka.TestConsumerConfiguration;
+import com.travelbooking.testutils.kafka.TestSubscription;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -29,8 +25,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,6 +37,7 @@ import static org.awaitility.Awaitility.await;
                partitions = 1,
                bootstrapServersProperty = "spring.kafka.bootstrap-servers")
 @DirtiesContext
+@Import(TestConsumerConfiguration.class)
 class HotelServiceIntegrationTest {
     
     @Container
@@ -57,6 +52,11 @@ class HotelServiceIntegrationTest {
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
     }
+    
+    @AfterEach
+    void tearDown() {
+        TestSubscription.closeQuietly(testSubscription);
+    }
 
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
@@ -65,7 +65,9 @@ class HotelServiceIntegrationTest {
     private HotelReservationRepository repository;
 
     @Autowired
-    private EmbeddedKafkaBroker embeddedKafkaBroker;
+    private TestConsumer testConsumer;
+    
+    private TestSubscription<String, HotelReservedEvent> testSubscription;
 
     @Test
     void shouldProcessHotelReservationSuccessfully() throws Exception {
@@ -85,43 +87,21 @@ class HotelServiceIntegrationTest {
         );
 
         // Setup consumer for replies
-        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("test-group", "true", embeddedKafkaBroker);
-        consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "com.travelbooking.*");
-        consumerProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, HotelReservedEvent.class);
-
-        DefaultKafkaConsumerFactory<String, HotelReservedEvent> consumerFactory = 
-            new DefaultKafkaConsumerFactory<>(consumerProps);
-        
-        Consumer<String, HotelReservedEvent> consumer = consumerFactory.createConsumer();
-        consumer.subscribe(Collections.singletonList("hotel-service-replies"));
+        testSubscription = testConsumer.subscribeForJSon("hotel-service-replies", HotelReservedEvent.class);
 
         // When
         kafkaTemplate.send("hotel-service-commands", correlationId, command).get();
 
         // Then - verify reply event
-        await().atMost(Duration.ofSeconds(10))
-            .untilAsserted(() -> {
-                ConsumerRecords<String, HotelReservedEvent> records = consumer.poll(Duration.ofMillis(500));
-                
-                HotelReservedEvent event = null;
-                for (ConsumerRecord<String, HotelReservedEvent> record : records) {
-                    if (correlationId.equals(record.value().correlationId())) {
-                        event = record.value();
-                        break;
-                    }
-                }
-                
-                assertThat(event).isNotNull().as("Should find event with matching correlation ID");
-                assertThat(event.correlationId()).isEqualTo(correlationId);
-                assertThat(event.reservationId()).isNotNull();
-                assertThat(event.confirmationNumber())
-                    .isNotNull()
-                    .startsWith("HR-");
-                assertThat(event.totalPrice()).isEqualTo(new BigDecimal("1050.00")); // 7 nights * $150
-            });
+        testSubscription.assertRecordReceived(record -> {
+            HotelReservedEvent event = record.value();
+            assertThat(event.correlationId()).isEqualTo(correlationId);
+            assertThat(event.reservationId()).isNotNull();
+            assertThat(event.confirmationNumber())
+                .isNotNull()
+                .startsWith("HR-");
+            assertThat(event.totalPrice()).isEqualTo(new BigDecimal("1050.00")); // 7 nights * $150
+        });
 
         // Verify database state
         Thread.sleep(1000); // Give time for transaction to commit
@@ -134,7 +114,5 @@ class HotelServiceIntegrationTest {
         assertThat(reservation.getCheckInDate()).isEqualTo(checkInDate);
         assertThat(reservation.getCheckOutDate()).isEqualTo(checkOutDate);
         assertThat(reservation.getTotalPrice()).isEqualTo(new BigDecimal("1050.00"));
-        
-        consumer.close();
     }
 }

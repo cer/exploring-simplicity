@@ -2,15 +2,15 @@
 ## 1. Update tests to use TestSubscriber @Bean
 
 ### 1.1 Verify TestConsumer @Bean setup
-[ ] Verify TestConsumer is already a @Bean in TestConsumerConfiguration
-[ ] Verify TestConsumerConfiguration is imported in test classes that need it
+[x] Verify TestConsumer is already a @Bean in TestConsumerConfiguration
+[x] Verify TestConsumerConfiguration is imported in test classes that need it
 
 ### 1.2 Update HotelServiceIntegrationTest
-[ ] Add @Import(TestConsumerConfiguration.class) to test configuration
-[ ] Add @Autowired TestConsumer field
-[ ] Replace manual consumer creation with testConsumer.subscribe()
-[ ] Ensure TestSubscription.closeQuietly() is used in @AfterEach
-[ ] Run gradle check for hotel-service
+[x] Add @Import(TestConsumerConfiguration.class) to test configuration
+[x] Add @Autowired TestConsumer field
+[x] Replace manual consumer creation with testConsumer.subscribe()
+[x] Ensure TestSubscription.closeQuietly() is used in @AfterEach
+[x] Run gradle check for hotel-service
 [ ] Commit changes
 
 ### 1.3 Update TripBookingServiceIntegrationTest  
