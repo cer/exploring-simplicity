@@ -95,13 +95,16 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 [x] Commit changes
 
 ## 8. Refactor WipItinerary to use domain methods instead of multiple setters
-[ ] Add noteFlightBooked(UUID flightBookingId) method to WipItinerary that sets both ID and state to FLIGHT_BOOKED
-[ ] Add noteHotelReserved(UUID hotelReservationId, BigDecimal totalCost) method that sets ID and state (HOTEL_RESERVED if tripRequest.includesCar(), COMPLETED with totalCost if not)
-[ ] Add noteCarRented(UUID carRentalId, BigDecimal totalCost) method to WipItinerary that sets ID, state to COMPLETED, and totalCost
-[ ] Update TripBookingOrchestrator.handleFlightBooked() to use noteFlightBooked()
-[ ] Update TripBookingOrchestrator.handleHotelReserved() to use noteHotelReserved(hotelReservationId, totalCost) and remove completeSaga() call
-[ ] Update TripBookingOrchestrator.handleCarRented() to use noteCarRented(carRentalId, totalCost) and remove completeSaga() call
+[ ] Add flightPrice and hotelPrice fields to WipItinerary to store prices from events
+[ ] Add noteFlightBooked(UUID flightBookingId, BigDecimal flightPrice) method that sets ID, price, and state to FLIGHT_BOOKED
+[ ] Add noteHotelReserved(UUID hotelReservationId, BigDecimal hotelPrice) method that sets ID, price, and state (HOTEL_RESERVED if tripRequest.includesCar(), COMPLETED with calculated totalCost if not)
+[ ] Add noteCarRented(UUID carRentalId, BigDecimal carPrice) method that sets ID, state to COMPLETED, and calculates totalCost from stored prices
+[ ] Update TripBookingOrchestrator.handleFlightBooked() to use noteFlightBooked(flightBookingId, flightPrice)
+[ ] Update TripBookingOrchestrator.handleHotelReserved() to use noteHotelReserved(hotelReservationId, hotelPrice) and remove completeSaga() call
+[ ] Update TripBookingOrchestrator.handleCarRented() to use noteCarRented(carRentalId, carPrice) and remove completeSaga() call
 [ ] Remove TripBookingOrchestrator.completeSaga() method entirely
+[ ] Remove TripBookingOrchestrator.getFlightPrice() method
+[ ] Remove TripBookingOrchestrator.getHotelPrice() method
 [ ] Remove setState(), setFlightBookingId(), setHotelReservationId(), setCarRentalId(), and setTotalCost() methods (domain methods will access fields directly)
 [ ] Run gradle check
 [ ] Commit changes
