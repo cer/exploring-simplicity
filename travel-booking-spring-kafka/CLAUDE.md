@@ -5,3 +5,4 @@
 - Don't write tests for constructors, e.g. testTravelerWithNoArgsConstructor
 - Don't add finders to repositories unless they are needed by the business logic
 - IMPORTANT do not disable pre-commit hooks
+- integration tests should be in src/integrationTests using (apply plugin: IntegrationTestsPlugin)
