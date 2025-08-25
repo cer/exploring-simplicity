@@ -72,9 +72,6 @@ public class WipItinerary {
         return state;
     }
     
-    public void setState(SagaState state) {
-        this.state = state;
-    }
     
     public UUID getTravelerId() {
         return tripRequest != null ? tripRequest.travelerId() : null;
@@ -84,33 +81,21 @@ public class WipItinerary {
         return flightBookingId;
     }
     
-    public void setFlightBookingId(UUID flightBookingId) {
-        this.flightBookingId = flightBookingId;
-    }
     
     public UUID getHotelReservationId() {
         return hotelReservationId;
     }
     
-    public void setHotelReservationId(UUID hotelReservationId) {
-        this.hotelReservationId = hotelReservationId;
-    }
     
     public UUID getCarRentalId() {
         return carRentalId;
     }
     
-    public void setCarRentalId(UUID carRentalId) {
-        this.carRentalId = carRentalId;
-    }
     
     public BigDecimal getTotalCost() {
         return totalCost;
     }
     
-    public void setTotalCost(BigDecimal totalCost) {
-        this.totalCost = totalCost;
-    }
     
     public LocalDateTime getCreatedAt() {
         return createdAt;

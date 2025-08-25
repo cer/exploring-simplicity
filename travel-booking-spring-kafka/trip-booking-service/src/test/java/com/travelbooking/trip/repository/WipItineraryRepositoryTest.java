@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
@@ -75,14 +76,15 @@ class WipItineraryRepositoryTest {
         entityManager.clear();
         
         WipItinerary toUpdate = repository.findById(sagaId).orElseThrow();
-        toUpdate.setState(SagaState.FLIGHT_BOOKED);
-        toUpdate.setFlightBookingId(UUID.randomUUID());
+        UUID flightBookingId = UUID.randomUUID();
+        toUpdate.noteFlightBooked(flightBookingId, new BigDecimal("500.00"));
         repository.save(toUpdate);
         entityManager.flush();
         entityManager.clear();
         
         WipItinerary updated = repository.findById(sagaId).orElseThrow();
         assertThat(updated.getState()).isEqualTo(SagaState.FLIGHT_BOOKED);
-        assertThat(updated.getFlightBookingId()).isNotNull();
+        assertThat(updated.getFlightBookingId()).isEqualTo(flightBookingId);
+        assertThat(updated.getFlightPrice()).isEqualTo(new BigDecimal("500.00"));
     }
 }

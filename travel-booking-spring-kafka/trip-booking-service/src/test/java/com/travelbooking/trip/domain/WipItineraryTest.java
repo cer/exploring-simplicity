@@ -43,58 +43,6 @@ class WipItineraryTest {
     }
     
     @Test
-    void testUpdateFlightBooking() {
-        UUID travelerId = UUID.randomUUID();
-        WipItinerary wipItinerary = new WipItinerary(UUID.randomUUID(), createTripRequest(travelerId));
-        UUID flightBookingId = UUID.randomUUID();
-        
-        wipItinerary.setFlightBookingId(flightBookingId);
-        wipItinerary.setState(SagaState.FLIGHT_BOOKED);
-        
-        assertThat(wipItinerary.getFlightBookingId()).isEqualTo(flightBookingId);
-        assertThat(wipItinerary.getState()).isEqualTo(SagaState.FLIGHT_BOOKED);
-    }
-    
-    @Test
-    void testUpdateHotelReservation() {
-        UUID travelerId = UUID.randomUUID();
-        WipItinerary wipItinerary = new WipItinerary(UUID.randomUUID(), createTripRequest(travelerId));
-        UUID hotelReservationId = UUID.randomUUID();
-        
-        wipItinerary.setHotelReservationId(hotelReservationId);
-        wipItinerary.setState(SagaState.HOTEL_RESERVED);
-        
-        assertThat(wipItinerary.getHotelReservationId()).isEqualTo(hotelReservationId);
-        assertThat(wipItinerary.getState()).isEqualTo(SagaState.HOTEL_RESERVED);
-    }
-    
-    @Test
-    void testUpdateCarRental() {
-        UUID travelerId = UUID.randomUUID();
-        WipItinerary wipItinerary = new WipItinerary(UUID.randomUUID(), createTripRequest(travelerId));
-        UUID carRentalId = UUID.randomUUID();
-        
-        wipItinerary.setCarRentalId(carRentalId);
-        wipItinerary.setState(SagaState.CAR_RENTED);
-        
-        assertThat(wipItinerary.getCarRentalId()).isEqualTo(carRentalId);
-        assertThat(wipItinerary.getState()).isEqualTo(SagaState.CAR_RENTED);
-    }
-    
-    @Test
-    void testCompleteSaga() {
-        UUID travelerId = UUID.randomUUID();
-        WipItinerary wipItinerary = new WipItinerary(UUID.randomUUID(), createTripRequest(travelerId));
-        BigDecimal totalCost = new BigDecimal("1500.00");
-        
-        wipItinerary.setState(SagaState.COMPLETED);
-        wipItinerary.setTotalCost(totalCost);
-        
-        assertThat(wipItinerary.getState()).isEqualTo(SagaState.COMPLETED);
-        assertThat(wipItinerary.getTotalCost()).isEqualTo(totalCost);
-    }
-    
-    @Test
     void testWipItineraryCreationWithTripRequest() {
         UUID sagaId = UUID.randomUUID();
         UUID travelerId = UUID.randomUUID();
