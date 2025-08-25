@@ -145,4 +145,57 @@ class WipItineraryTest {
         assertThat(wipItinerary.getState()).isEqualTo(SagaState.FLIGHT_BOOKED);
     }
     
+    @Test
+    void testNoteHotelReservedWithCarRequired() {
+        UUID sagaId = UUID.randomUUID();
+        UUID travelerId = UUID.randomUUID();
+        TripRequest tripRequest = createTripRequest(travelerId);
+        WipItinerary wipItinerary = new WipItinerary(sagaId, tripRequest);
+        
+        // First book flight
+        wipItinerary.noteFlightBooked(UUID.randomUUID(), new BigDecimal("500.00"));
+        
+        UUID hotelReservationId = UUID.randomUUID();
+        BigDecimal hotelPrice = new BigDecimal("700.00");
+        
+        wipItinerary.noteHotelReserved(hotelReservationId, hotelPrice);
+        
+        assertThat(wipItinerary.getHotelReservationId()).isEqualTo(hotelReservationId);
+        assertThat(wipItinerary.getHotelPrice()).isEqualTo(hotelPrice);
+        assertThat(wipItinerary.getState()).isEqualTo(SagaState.HOTEL_RESERVED);
+        assertThat(wipItinerary.getTotalCost()).isNull();
+    }
+    
+    @Test
+    void testNoteHotelReservedWithoutCarRequired() {
+        UUID sagaId = UUID.randomUUID();
+        UUID travelerId = UUID.randomUUID();
+        // Create trip request without car
+        TripRequest tripRequest = new TripRequest(
+            travelerId,
+            "NYC", "LAX",
+            LocalDate.now().plusDays(7),
+            LocalDate.now().plusDays(14),
+            "Hilton LAX",
+            null, null,
+            null,
+            null
+        );
+        WipItinerary wipItinerary = new WipItinerary(sagaId, tripRequest);
+        
+        // First book flight
+        BigDecimal flightPrice = new BigDecimal("500.00");
+        wipItinerary.noteFlightBooked(UUID.randomUUID(), flightPrice);
+        
+        UUID hotelReservationId = UUID.randomUUID();
+        BigDecimal hotelPrice = new BigDecimal("700.00");
+        
+        wipItinerary.noteHotelReserved(hotelReservationId, hotelPrice);
+        
+        assertThat(wipItinerary.getHotelReservationId()).isEqualTo(hotelReservationId);
+        assertThat(wipItinerary.getHotelPrice()).isEqualTo(hotelPrice);
+        assertThat(wipItinerary.getState()).isEqualTo(SagaState.COMPLETED);
+        assertThat(wipItinerary.getTotalCost()).isEqualTo(flightPrice.add(hotelPrice));
+    }
+    
 }

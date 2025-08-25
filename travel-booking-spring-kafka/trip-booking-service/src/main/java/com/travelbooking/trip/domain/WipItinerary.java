@@ -25,6 +25,9 @@ public class WipItinerary {
     
     private UUID hotelReservationId;
     
+    @Column(precision = 10, scale = 2)
+    private BigDecimal hotelPrice;
+    
     private UUID carRentalId;
     
     @Column(precision = 10, scale = 2)
@@ -129,9 +132,25 @@ public class WipItinerary {
         return flightPrice;
     }
     
+    public BigDecimal getHotelPrice() {
+        return hotelPrice;
+    }
+    
     public void noteFlightBooked(UUID flightBookingId, BigDecimal flightPrice) {
         this.flightBookingId = flightBookingId;
         this.flightPrice = flightPrice;
         this.state = SagaState.FLIGHT_BOOKED;
+    }
+    
+    public void noteHotelReserved(UUID hotelReservationId, BigDecimal hotelPrice) {
+        this.hotelReservationId = hotelReservationId;
+        this.hotelPrice = hotelPrice;
+        
+        if (tripRequest.includesCar()) {
+            this.state = SagaState.HOTEL_RESERVED;
+        } else {
+            this.state = SagaState.COMPLETED;
+            this.totalCost = this.flightPrice.add(hotelPrice);
+        }
     }
 }

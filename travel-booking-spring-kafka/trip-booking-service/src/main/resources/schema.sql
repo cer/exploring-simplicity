@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS wip_itinerary (
     flight_booking_id UUID,
     flight_price DECIMAL(10, 2),
     hotel_reservation_id UUID,
+    hotel_price DECIMAL(10, 2),
     car_rental_id UUID,
     total_cost DECIMAL(10, 2),
     -- TripRequest embedded fields
