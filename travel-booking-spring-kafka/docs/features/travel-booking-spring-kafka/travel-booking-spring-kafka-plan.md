@@ -292,36 +292,36 @@ Implement the Trip Booking Service orchestrator with happy path flow.
 
 Using TDD approach:
 
-[ ] Write test for SagaState enum
-[ ] Create SagaState enum with all states (STARTED, FLIGHT_BOOKED, HOTEL_RESERVED, CAR_RENTED, COMPLETED)
+[x] Write test for SagaState enum
+[x] Create SagaState enum with all states (STARTED, FLIGHT_BOOKED, HOTEL_RESERVED, CAR_RENTED, COMPLETED)
 
-[ ] Write test for WipItinerary entity
-[ ] Implement WipItinerary entity with saga state fields (sagaId, state, travelerId, flightBookingId, hotelReservationId, carRentalId, totalCost, createdAt, lastModifiedAt)
-[ ] Write test for WipItineraryRepository
-[ ] Implement repository with JPA
+[x] Write test for WipItinerary entity
+[x] Implement WipItinerary entity with saga state fields (sagaId, state, travelerId, flightBookingId, hotelReservationId, carRentalId, totalCost, createdAt, lastModifiedAt)
+[x] Write test for WipItineraryRepository
+[x] Implement repository with JPA
 
-[ ] Write test for service proxies
-[ ] Implement FlightBookingServiceProxy with Kafka publishing
-[ ] Implement HotelServiceProxy with Kafka publishing
-[ ] Implement CarRentalServiceProxy with Kafka publishing
+[x] Write test for service proxies
+[x] Implement FlightBookingServiceProxy with Kafka publishing
+[x] Implement HotelServiceProxy with Kafka publishing
+[x] Implement CarRentalServiceProxy with Kafka publishing
 
-[ ] Write test for TripBookingOrchestrator.startSaga()
-[ ] Implement saga initiation logic
-[ ] Create WipItinerary with STARTED state
-[ ] Send first command (book flight)
+[x] Write test for TripBookingOrchestrator.startSaga()
+[x] Implement saga initiation logic
+[x] Create WipItinerary with STARTED state
+[x] Send first command (book flight)
 
-[ ] Write test for proxy listeners
-[ ] Implement @KafkaListener in each proxy for replies
-[ ] Wire listeners to orchestrator handlers
+[x] Write test for proxy listeners
+[x] Implement @KafkaListener in each proxy for replies
+[x] Wire listeners to orchestrator handlers
 
-[ ] Write test for state transitions
-[ ] Implement handleFlightBooked() -> trigger hotel
-[ ] Implement handleHotelReserved() -> trigger car (if requested)
-[ ] Implement handleCarRented() -> complete saga
+[x] Write test for state transitions
+[x] Implement handleFlightBooked() -> trigger hotel
+[x] Implement handleHotelReserved() -> trigger car (if requested)
+[x] Implement handleCarRented() -> complete saga
 
-[ ] Create database migration for wip_itinerary table
-[ ] Write integration test for complete happy path
-[ ] Verify orchestrator coordinates all services
+[x] Create database migration for wip_itinerary table
+[x] Write integration test for complete happy path
+[x] Verify orchestrator coordinates all services
 
 The orchestrator should:
 - Progress through all saga states sequentially
