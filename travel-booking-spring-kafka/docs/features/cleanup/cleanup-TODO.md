@@ -32,12 +32,16 @@
 [ ] Add validation and error handling tests
 
 ## 5. Verify command message is sent before simulating reply
-[ ] Create helper method to verify message was sent to command topic
-[ ] Add assertion in FlightServiceIntegrationTest before sending replies
-[ ] Add assertion in HotelServiceIntegrationTest before sending replies  
-[ ] Add assertion in CarRentalServiceIntegrationTest before sending replies
-[ ] Add assertion in TripBookingServiceIntegrationTest orchestration tests
-[ ] Consider adding timeout for command verification
+[ ] Analysis: FlightServiceIntegrationTest - DOES NOT simulate replies, it sends commands and waits for real replies
+[ ] Analysis: HotelServiceIntegrationTest - DOES NOT simulate replies, it sends commands and waits for real replies
+[ ] Analysis: CarRentalServiceIntegrationTest - DOES NOT simulate replies, it sends commands and waits for real replies
+[ ] Analysis: TripBookingServiceIntegrationTest - DOES simulate replies without verifying commands were sent
+[ ] Create TestSubscription helper to verify message was sent to command topic
+[ ] Add verification in TripBookingServiceIntegrationTest.testCompleteHappyPathWithAllServices() before line 113
+[ ] Add verification in TripBookingServiceIntegrationTest.testCompleteHappyPathWithAllServices() before line 128
+[ ] Add verification in TripBookingServiceIntegrationTest.testCompleteHappyPathWithAllServices() before line 143
+[ ] Add verification in TripBookingServiceIntegrationTest.testHappyPathWithoutCarRental() before line 187
+[ ] Add verification in TripBookingServiceIntegrationTest.testHappyPathWithoutCarRental() before line 196
 
 ## 6. Rename command reply classes from *Event to *Reply
 [ ] Rename FlightBookedEvent to FlightBookedReply
