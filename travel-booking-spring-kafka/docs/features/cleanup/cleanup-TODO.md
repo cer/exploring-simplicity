@@ -40,11 +40,33 @@
 [ ] Add verification in testHappyPathWithoutCarRental() before simulating HotelReservedEvent
 
 ## 6. Rename command reply classes from *Event to *Reply
-[ ] Rename FlightBookedEvent to FlightBookedReply
-[ ] Update all references to FlightBookedEvent
-[ ] Rename HotelBookedEvent to HotelBookedReply  
-[ ] Update all references to HotelBookedEvent
-[ ] Rename CarRentedEvent to CarRentedReply
-[ ] Update all references to CarRentedEvent
-[ ] Update package imports and test assertions
-[ ] Update JSON deserializers if needed
+
+### 6.1 Rename FlightBookedEvent to FlightBookedReply
+[ ] Rename class FlightBookedEvent to FlightBookedReply in flight-service
+[ ] Update all references in flight-service (handler, tests)
+[ ] Update all references in trip-booking-service
+[ ] Run gradle check
+[ ] Commit changes
+
+### 6.2 Rename HotelBookedEvent to HotelBookedReply  
+[ ] Rename class HotelBookedEvent to HotelBookedReply in hotel-service
+[ ] Update all references in hotel-service (handler, tests)
+[ ] Update all references in trip-booking-service
+[ ] Run gradle check
+[ ] Commit changes
+
+### 6.3 Rename CarRentedEvent to CarRentedReply
+[ ] Rename class CarRentedEvent to CarRentedReply in car-rental-service
+[ ] Update all references in car-rental-service (handler, tests)
+[ ] Update all references in trip-booking-service
+[ ] Run gradle check
+[ ] Commit changes
+
+### 6.4 Rename trip-booking-service internal event classes
+[ ] Rename FlightBookedEvent to FlightBookedReply in trip-booking-service messaging package
+[ ] Rename HotelReservedEvent to HotelReservedReply in trip-booking-service messaging package
+[ ] Rename CarRentedEvent to CarRentedReply in trip-booking-service messaging package
+[ ] Update all references in TripBookingServiceIntegrationTest
+[ ] Update all references in event handlers
+[ ] Run gradle check
+[ ] Commit changes
