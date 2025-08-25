@@ -38,8 +38,7 @@ public class TripBookingOrchestrator {
     public UUID startSaga(TripRequest request) {
         UUID sagaId = UUID.randomUUID();
         
-        WipItinerary wipItinerary = new WipItinerary(sagaId, request.travelerId());
-        wipItinerary.setTripRequest(request);
+        WipItinerary wipItinerary = new WipItinerary(sagaId, request);
         repository.save(wipItinerary);
         
         logger.info("Starting saga {} for traveler {}", sagaId, request.travelerId());

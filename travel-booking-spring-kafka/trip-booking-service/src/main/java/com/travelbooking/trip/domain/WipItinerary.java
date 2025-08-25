@@ -55,6 +55,15 @@ public class WipItinerary {
         this.lastModifiedAt = LocalDateTime.now();
     }
     
+    public WipItinerary(UUID sagaId, TripRequest tripRequest) {
+        this.sagaId = sagaId;
+        this.state = SagaState.STARTED;
+        this.travelerId = tripRequest.travelerId();
+        this.tripRequest = tripRequest;
+        this.createdAt = LocalDateTime.now();
+        this.lastModifiedAt = LocalDateTime.now();
+    }
+    
     @PreUpdate
     public void preUpdate() {
         this.lastModifiedAt = LocalDateTime.now();
