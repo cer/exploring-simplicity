@@ -1,10 +1,25 @@
 
 ## 1. Update tests to use TestSubscriber @Bean
+
+### 1.1 Verify TestConsumer @Bean setup
 [ ] Verify TestConsumer is already a @Bean in TestConsumerConfiguration
-[ ] Update HotelServiceIntegrationTest to use @Autowired TestConsumer
-[ ] Update TripBookingServiceIntegrationTest to use @Autowired TestConsumer  
-[ ] Remove any manual TestConsumer instantiation from tests
-[ ] Ensure all tests use TestSubscription.closeQuietly() in @AfterEach
+[ ] Verify TestConsumerConfiguration is imported in test classes that need it
+
+### 1.2 Update HotelServiceIntegrationTest
+[ ] Add @Import(TestConsumerConfiguration.class) to test configuration
+[ ] Add @Autowired TestConsumer field
+[ ] Replace manual consumer creation with testConsumer.subscribe()
+[ ] Ensure TestSubscription.closeQuietly() is used in @AfterEach
+[ ] Run gradle check for hotel-service
+[ ] Commit changes
+
+### 1.3 Update TripBookingServiceIntegrationTest  
+[ ] Add @Import(TestConsumerConfiguration.class) to test configuration if needed
+[ ] Add @Autowired TestConsumer field if not present
+[ ] Replace any manual consumer creation with testConsumer.subscribe()
+[ ] Ensure TestSubscription.closeQuietly() is used in @AfterEach
+[ ] Run gradle check for trip-booking-service
+[ ] Commit changes
 
 ## 2. WipItinerary should take TravelRequest - not travelerID
 [ ] Write test for WipItinerary constructor accepting TravelRequest
