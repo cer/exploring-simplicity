@@ -16,9 +16,8 @@
 ## 3. Remove unnecessary saving of JPA entities retrieved by repository.find()
 [ ] Search for pattern: repository.findById() followed by repository.save()
 [ ] Identify which services have this anti-pattern
-[ ] Write tests to verify entity changes are persisted without explicit save
 [ ] Remove unnecessary save() calls after findById()
-[ ] Verify tests still pass after removal
+[ ] Verify existing tests still pass after removal
 
 ## 4. TripBookingServiceIntegrationTest: create via REST API
 [ ] Add Spring Boot Web dependency to trip-booking-service if not present
