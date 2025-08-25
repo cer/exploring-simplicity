@@ -1,3 +1,12 @@
+apply plugin: com.travelbooking.plugins.IntegrationTestsPlugin
+
 dependencies {
     implementation project(':common')
+    
+    // Add testcontainers dependencies for integration tests
+    integrationTestImplementation 'org.testcontainers:testcontainers'
+    integrationTestImplementation 'org.testcontainers:junit-jupiter'
+    integrationTestImplementation 'org.testcontainers:postgresql'
+    integrationTestImplementation 'org.testcontainers:kafka'
+    integrationTestImplementation 'org.awaitility:awaitility:4.2.0'
 }
