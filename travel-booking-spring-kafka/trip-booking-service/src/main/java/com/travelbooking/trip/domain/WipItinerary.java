@@ -20,6 +20,9 @@ public class WipItinerary {
     
     private UUID flightBookingId;
     
+    @Column(precision = 10, scale = 2)
+    private BigDecimal flightPrice;
+    
     private UUID hotelReservationId;
     
     private UUID carRentalId;
@@ -120,5 +123,15 @@ public class WipItinerary {
     
     public TripRequest getTripRequest() {
         return tripRequest;
+    }
+    
+    public BigDecimal getFlightPrice() {
+        return flightPrice;
+    }
+    
+    public void noteFlightBooked(UUID flightBookingId, BigDecimal flightPrice) {
+        this.flightBookingId = flightBookingId;
+        this.flightPrice = flightPrice;
+        this.state = SagaState.FLIGHT_BOOKED;
     }
 }

@@ -128,4 +128,21 @@ class WipItineraryTest {
         assertThat(wipItinerary.getTripRequest().includesCar()).isTrue();
     }
     
+    @Test
+    void testNoteFlightBooked() {
+        UUID sagaId = UUID.randomUUID();
+        UUID travelerId = UUID.randomUUID();
+        TripRequest tripRequest = createTripRequest(travelerId);
+        WipItinerary wipItinerary = new WipItinerary(sagaId, tripRequest);
+        
+        UUID flightBookingId = UUID.randomUUID();
+        BigDecimal flightPrice = new BigDecimal("500.00");
+        
+        wipItinerary.noteFlightBooked(flightBookingId, flightPrice);
+        
+        assertThat(wipItinerary.getFlightBookingId()).isEqualTo(flightBookingId);
+        assertThat(wipItinerary.getFlightPrice()).isEqualTo(flightPrice);
+        assertThat(wipItinerary.getState()).isEqualTo(SagaState.FLIGHT_BOOKED);
+    }
+    
 }

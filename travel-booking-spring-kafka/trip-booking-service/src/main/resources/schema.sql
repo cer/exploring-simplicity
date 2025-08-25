@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS wip_itinerary (
     saga_id UUID PRIMARY KEY,
     state VARCHAR(50) NOT NULL,
     flight_booking_id UUID,
+    flight_price DECIMAL(10, 2),
     hotel_reservation_id UUID,
     car_rental_id UUID,
     total_cost DECIMAL(10, 2),
