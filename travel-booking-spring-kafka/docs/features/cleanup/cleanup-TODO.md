@@ -14,10 +14,14 @@
 [ ] Remove old constructor that takes travelerId
 
 ## 3. Remove unnecessary saving of JPA entities retrieved by repository.find()
-[ ] Search for pattern: repository.findById() followed by repository.save()
-[ ] Identify which services have this anti-pattern
-[ ] Remove unnecessary save() calls after findById()
-[ ] Verify existing tests still pass after removal
+[x] Search for pattern: repository.findById() followed by repository.save()
+[x] Identify which services have this anti-pattern - Found in TripBookingOrchestrator
+[ ] Remove repository.save() at line 68 in TripBookingOrchestrator.handleFlightBooked()
+[ ] Remove repository.save() at line 90 in TripBookingOrchestrator.handleHotelReserved()
+[ ] Remove repository.save() at line 119 in TripBookingOrchestrator.handleCarRented()
+[ ] Remove repository.save() at line 133 in TripBookingOrchestrator.completeSaga()
+[ ] Keep repository.save() at line 43 (new entity creation - this one is needed)
+[ ] Run gradle check to verify existing tests still pass after removal
 
 ## 4. TripBookingServiceIntegrationTest: create via REST API
 [ ] Add Spring Boot Web dependency to trip-booking-service if not present
