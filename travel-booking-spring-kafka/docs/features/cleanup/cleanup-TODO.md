@@ -93,3 +93,16 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 [x] Update any tests that use the old constructor
 [x] Run gradle check
 [x] Commit changes
+
+## 8. Refactor WipItinerary to use domain methods instead of multiple setters
+[ ] Add noteFlightBooked(UUID flightBookingId) method to WipItinerary that sets both ID and state
+[ ] Add noteHotelReserved(UUID hotelReservationId) method to WipItinerary that sets both ID and state
+[ ] Add noteCarRented(UUID carRentalId) method to WipItinerary that sets both ID and state
+[ ] Add markCompleted(BigDecimal totalCost) method to WipItinerary that sets both state and total cost
+[ ] Update TripBookingOrchestrator.handleFlightBooked() to use noteFlightBooked()
+[ ] Update TripBookingOrchestrator.handleHotelReserved() to use noteHotelReserved()
+[ ] Update TripBookingOrchestrator.handleCarRented() to use noteCarRented()
+[ ] Update TripBookingOrchestrator.completeSaga() to use markCompleted()
+[ ] Consider making individual setters private after refactoring
+[ ] Run gradle check
+[ ] Commit changes
