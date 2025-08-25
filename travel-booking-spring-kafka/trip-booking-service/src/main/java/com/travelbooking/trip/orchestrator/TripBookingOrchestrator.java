@@ -64,7 +64,6 @@ public class TripBookingOrchestrator {
         
         wipItinerary.setFlightBookingId(flightBookingId);
         wipItinerary.setState(SagaState.FLIGHT_BOOKED);
-        repository.save(wipItinerary);
         
         TripRequest originalRequest = wipItinerary.getTripRequest();
         
@@ -86,7 +85,6 @@ public class TripBookingOrchestrator {
         
         wipItinerary.setHotelReservationId(hotelReservationId);
         wipItinerary.setState(SagaState.HOTEL_RESERVED);
-        repository.save(wipItinerary);
         
         TripRequest originalRequest = wipItinerary.getTripRequest();
         
@@ -115,7 +113,6 @@ public class TripBookingOrchestrator {
         
         wipItinerary.setCarRentalId(carRentalId);
         wipItinerary.setState(SagaState.CAR_RENTED);
-        repository.save(wipItinerary);
         
         BigDecimal totalCost = carPrice.add(getHotelPrice(sagaId)).add(getFlightPrice(sagaId));
         completeSaga(sagaId, totalCost);
@@ -129,7 +126,6 @@ public class TripBookingOrchestrator {
         
         wipItinerary.setState(SagaState.COMPLETED);
         wipItinerary.setTotalCost(totalCost);
-        repository.save(wipItinerary);
     }
     
     private BigDecimal getFlightPrice(UUID sagaId) {

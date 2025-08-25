@@ -31,12 +31,12 @@
 ## 3. Remove unnecessary saving of JPA entities retrieved by repository.find()
 Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't need explicit save() within @Transactional methods
 
-[ ] Remove repository.save() in handleFlightBooked() after modifying retrieved WipItinerary
-[ ] Remove repository.save() in handleHotelReserved() after modifying retrieved WipItinerary
-[ ] Remove repository.save() in handleCarRented() after modifying retrieved WipItinerary
-[ ] Remove repository.save() in completeSaga() after modifying retrieved WipItinerary
-[ ] Keep repository.save() in startSaga() (new entity creation - this one is needed)
-[ ] Run gradle check to verify existing tests still pass after removal
+[x] Remove repository.save() in handleFlightBooked() after modifying retrieved WipItinerary
+[x] Remove repository.save() in handleHotelReserved() after modifying retrieved WipItinerary
+[x] Remove repository.save() in handleCarRented() after modifying retrieved WipItinerary
+[x] Remove repository.save() in completeSaga() after modifying retrieved WipItinerary
+[x] Keep repository.save() in startSaga() (new entity creation - this one is needed)
+[x] Run gradle check to verify existing tests still pass after removal
 
 ## 4. TripBookingServiceIntegrationTest: create via REST API
 [ ] Add Spring Boot Web dependency to trip-booking-service if not present
