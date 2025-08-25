@@ -6,6 +6,7 @@ import com.travelbooking.hotel.messaging.messages.HotelReservedEvent;
 import com.travelbooking.hotel.messaging.messages.ReserveHotelCommand;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -100,16 +102,26 @@ class HotelServiceIntegrationTest {
         kafkaTemplate.send("hotel-service-commands", correlationId, command).get();
 
         // Then - verify reply event
-        ConsumerRecords<String, HotelReservedEvent> records = consumer.poll(Duration.ofSeconds(10));
-        assertThat(records.isEmpty()).isFalse().as("Should receive reply event");
-        
-        HotelReservedEvent event = records.iterator().next().value();
-        assertThat(event.correlationId()).isEqualTo(correlationId);
-        assertThat(event.reservationId()).isNotNull();
-        assertThat(event.confirmationNumber())
-            .isNotNull()
-            .startsWith("HR-");
-        assertThat(event.totalPrice()).isEqualTo(new BigDecimal("1050.00")); // 7 nights * $150
+        await().atMost(Duration.ofSeconds(10))
+            .untilAsserted(() -> {
+                ConsumerRecords<String, HotelReservedEvent> records = consumer.poll(Duration.ofMillis(500));
+                
+                HotelReservedEvent event = null;
+                for (ConsumerRecord<String, HotelReservedEvent> record : records) {
+                    if (correlationId.equals(record.value().correlationId())) {
+                        event = record.value();
+                        break;
+                    }
+                }
+                
+                assertThat(event).isNotNull().as("Should find event with matching correlation ID");
+                assertThat(event.correlationId()).isEqualTo(correlationId);
+                assertThat(event.reservationId()).isNotNull();
+                assertThat(event.confirmationNumber())
+                    .isNotNull()
+                    .startsWith("HR-");
+                assertThat(event.totalPrice()).isEqualTo(new BigDecimal("1050.00")); // 7 nights * $150
+            });
 
         // Verify database state
         Thread.sleep(1000); // Give time for transaction to commit
