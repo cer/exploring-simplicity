@@ -31,17 +31,13 @@
 [ ] Remove direct service calls in favor of REST API calls
 [ ] Add validation and error handling tests
 
-## 5. Verify command message is sent before simulating reply
-[ ] Analysis: FlightServiceIntegrationTest - DOES NOT simulate replies, it sends commands and waits for real replies
-[ ] Analysis: HotelServiceIntegrationTest - DOES NOT simulate replies, it sends commands and waits for real replies
-[ ] Analysis: CarRentalServiceIntegrationTest - DOES NOT simulate replies, it sends commands and waits for real replies
-[ ] Analysis: TripBookingServiceIntegrationTest - DOES simulate replies without verifying commands were sent
+## 5. Verify command message is sent before simulating reply (TripBookingServiceIntegrationTest only)
 [ ] Create TestSubscription helper to verify message was sent to command topic
-[ ] Add verification in TripBookingServiceIntegrationTest.testCompleteHappyPathWithAllServices() before line 113
-[ ] Add verification in TripBookingServiceIntegrationTest.testCompleteHappyPathWithAllServices() before line 128
-[ ] Add verification in TripBookingServiceIntegrationTest.testCompleteHappyPathWithAllServices() before line 143
-[ ] Add verification in TripBookingServiceIntegrationTest.testHappyPathWithoutCarRental() before line 187
-[ ] Add verification in TripBookingServiceIntegrationTest.testHappyPathWithoutCarRental() before line 196
+[ ] Add verification in TripBookingServiceIntegrationTest.testCompleteHappyPathWithAllServices() before line 113 (verify flight command sent)
+[ ] Add verification in TripBookingServiceIntegrationTest.testCompleteHappyPathWithAllServices() before line 128 (verify hotel command sent)
+[ ] Add verification in TripBookingServiceIntegrationTest.testCompleteHappyPathWithAllServices() before line 143 (verify car command sent)
+[ ] Add verification in TripBookingServiceIntegrationTest.testHappyPathWithoutCarRental() before line 187 (verify flight command sent)
+[ ] Add verification in TripBookingServiceIntegrationTest.testHappyPathWithoutCarRental() before line 196 (verify hotel command sent)
 
 ## 6. Rename command reply classes from *Event to *Reply
 [ ] Rename FlightBookedEvent to FlightBookedReply
