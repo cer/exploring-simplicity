@@ -96,13 +96,12 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 
 ## 8. Refactor WipItinerary to use domain methods instead of multiple setters
 [ ] Add noteFlightBooked(UUID flightBookingId) method to WipItinerary that sets both ID and state to FLIGHT_BOOKED
-[ ] Add noteHotelReserved(UUID hotelReservationId) method that sets ID and state (HOTEL_RESERVED if tripRequest.includesCar(), COMPLETED if not)
-[ ] Add noteCarRented(UUID carRentalId) method to WipItinerary that sets both ID and state to CAR_RENTED
-[ ] Add markCompleted(BigDecimal totalCost) method to WipItinerary that sets state to COMPLETED and stores total cost
+[ ] Add noteHotelReserved(UUID hotelReservationId, BigDecimal totalCost) method that sets ID and state (HOTEL_RESERVED if tripRequest.includesCar(), COMPLETED with totalCost if not)
+[ ] Add noteCarRented(UUID carRentalId, BigDecimal totalCost) method to WipItinerary that sets ID, state to COMPLETED, and totalCost
 [ ] Update TripBookingOrchestrator.handleFlightBooked() to use noteFlightBooked()
-[ ] Update TripBookingOrchestrator.handleHotelReserved() to use noteHotelReserved(hotelReservationId)
-[ ] Update TripBookingOrchestrator.handleCarRented() to use noteCarRented()
-[ ] Update TripBookingOrchestrator.completeSaga() to use markCompleted()
+[ ] Update TripBookingOrchestrator.handleHotelReserved() to use noteHotelReserved(hotelReservationId, totalCost) and remove completeSaga() call
+[ ] Update TripBookingOrchestrator.handleCarRented() to use noteCarRented(carRentalId, totalCost) and remove completeSaga() call
+[ ] Remove TripBookingOrchestrator.completeSaga() method entirely
 [ ] Make setState(), setFlightBookingId(), setHotelReservationId(), setCarRentalId(), and setTotalCost() private
 [ ] Run gradle check
 [ ] Commit changes
