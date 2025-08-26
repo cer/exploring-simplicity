@@ -2,7 +2,7 @@ package com.travelbooking.car;
 
 import com.travelbooking.car.domain.CarRental;
 import com.travelbooking.car.domain.CarRentalRepository;
-import com.travelbooking.car.messaging.messages.CarRentedEvent;
+import com.travelbooking.car.messaging.messages.CarRentedReply;
 import com.travelbooking.car.messaging.messages.RentCarCommand;
 import com.travelbooking.common.Constants;
 import com.travelbooking.testutils.kafka.TestConsumer;
@@ -76,11 +76,11 @@ class CarRentalServiceIntegrationTest {
     @Autowired
     private TestConsumer testConsumer;
 
-    private TestSubscription<String, CarRentedEvent> subscription;
+    private TestSubscription<String, CarRentedReply> subscription;
 
     @BeforeEach
     void setUp() {
-      subscription = testConsumer.subscribeForJSon(Constants.Topics.CAR_SERVICE_REPLIES, CarRentedEvent.class);
+      subscription = testConsumer.subscribeForJSon(Constants.Topics.CAR_SERVICE_REPLIES, CarRentedReply.class);
     }
     
     @AfterEach
@@ -112,7 +112,7 @@ class CarRentalServiceIntegrationTest {
         // Then - Wait for and verify the reply event
 
         subscription.assertRecordReceived(record -> {
-          CarRentedEvent event = record.value();
+          CarRentedReply event = record.value();
           assertThat(event).isNotNull();
           assertThat(event.correlationId()).isEqualTo(correlationId);
           assertThat(event.rentalId()).isNotBlank();
@@ -166,7 +166,7 @@ class CarRentalServiceIntegrationTest {
         // Then - Verify reply event with correct pricing
 
         subscription.assertRecordReceived(record -> {
-          CarRentedEvent event = record.value();
+          CarRentedReply event = record.value();
           assertThat(event).isNotNull();
           assertThat(event.correlationId()).isEqualTo(correlationId);
           // LUXURY at $150/day for 2 days = $300
@@ -213,7 +213,7 @@ class CarRentalServiceIntegrationTest {
         // Then - Verify Kafka reply
 
         subscription.assertRecordReceived(record -> {
-          CarRentedEvent event = record.value();
+          CarRentedReply event = record.value();
           assertThat(event.correlationId()).isEqualTo(correlationId);
           // SUV at $95/day for 3 days = $285
           assertThat(event.totalPrice()).isEqualTo(new BigDecimal("285.00"));

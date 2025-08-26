@@ -1,7 +1,7 @@
 package com.travelbooking.trip.listener;
 
 import com.travelbooking.common.Constants;
-import com.travelbooking.trip.messaging.CarRentedEvent;
+import com.travelbooking.trip.messaging.CarRentedReply;
 import com.travelbooking.trip.messaging.FlightBookedReply;
 import com.travelbooking.trip.messaging.HotelReservedReply;
 import com.travelbooking.trip.orchestrator.TripBookingOrchestrator;
@@ -36,7 +36,7 @@ public class ReplyListener {
 
     @KafkaListener(topics = Constants.Topics.CAR_SERVICE_REPLIES, 
                    groupId = Constants.ConsumerGroups.TRIP_BOOKING_GROUP)
-    public void handleCarReply(CarRentedEvent event) {
+    public void handleCarReply(CarRentedReply event) {
         logger.info("Received car rented event for correlation ID: {}", event.correlationId());
         orchestrator.handleCarRented(event.correlationId(), event.rentalId(), event.totalPrice());
     }

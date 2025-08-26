@@ -2,7 +2,7 @@ package com.travelbooking.car.messaging;
 
 import com.travelbooking.car.domain.CarRental;
 import com.travelbooking.car.domain.CarType;
-import com.travelbooking.car.messaging.messages.CarRentedEvent;
+import com.travelbooking.car.messaging.messages.CarRentedReply;
 import com.travelbooking.car.messaging.messages.RentCarCommand;
 import com.travelbooking.car.service.CarRentalService;
 import com.travelbooking.common.Constants;
@@ -71,7 +71,7 @@ public class CarCommandHandler {
             );
             
             // Create and send success event
-            CarRentedEvent event = new CarRentedEvent(
+            CarRentedReply event = new CarRentedReply(
                 command.correlationId(),
                 rental.getId().toString(),
                 rental.getConfirmationNumber(),

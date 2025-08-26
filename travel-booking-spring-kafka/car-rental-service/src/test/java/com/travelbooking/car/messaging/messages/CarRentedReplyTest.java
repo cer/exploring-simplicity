@@ -6,16 +6,16 @@ import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CarRentedEventTest {
+class CarRentedReplyTest {
 
     @Test
-    void shouldCreateCarRentedEventWithAllFields() {
+    void shouldCreateCarRentedReplyWithAllFields() {
         String correlationId = "saga-123";
         String rentalId = "rental-456";
         String confirmationNumber = "CR789012";
         BigDecimal totalPrice = new BigDecimal("225.00");
 
-        CarRentedEvent event = new CarRentedEvent(
+        CarRentedReply event = new CarRentedReply(
             correlationId,
             rentalId,
             confirmationNumber,

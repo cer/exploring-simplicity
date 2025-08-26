@@ -2,7 +2,7 @@ package com.travelbooking.car.messaging;
 
 import com.travelbooking.car.domain.CarRental;
 import com.travelbooking.car.domain.CarType;
-import com.travelbooking.car.messaging.messages.CarRentedEvent;
+import com.travelbooking.car.messaging.messages.CarRentedReply;
 import com.travelbooking.car.messaging.messages.RentCarCommand;
 import com.travelbooking.car.service.CarRentalService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -78,10 +78,10 @@ class CarCommandHandlerTest {
         carCommandHandler.handleCommand(record);
         
         // Then
-        ArgumentCaptor<CarRentedEvent> eventCaptor = ArgumentCaptor.forClass(CarRentedEvent.class);
+        ArgumentCaptor<CarRentedReply> eventCaptor = ArgumentCaptor.forClass(CarRentedReply.class);
         verify(kafkaTemplate).send(eq("car-service-replies"), eq(correlationId), eventCaptor.capture());
         
-        CarRentedEvent event = eventCaptor.getValue();
+        CarRentedReply event = eventCaptor.getValue();
         assertThat(event.correlationId()).isEqualTo(correlationId);
         assertThat(event.rentalId()).isEqualTo(rentalId.toString());
         assertThat(event.confirmationNumber()).isEqualTo("CR123456");
@@ -166,6 +166,6 @@ class CarCommandHandlerTest {
             isNull()
         );
         
-        verify(kafkaTemplate).send(eq("car-service-replies"), eq(correlationId), any(CarRentedEvent.class));
+        verify(kafkaTemplate).send(eq("car-service-replies"), eq(correlationId), any(CarRentedReply.class));
     }
 }

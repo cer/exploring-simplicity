@@ -71,11 +71,11 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 [x] Commit changes
 
 ### 6.3 Rename CarRentedEvent to CarRentedReply
-[ ] Rename class CarRentedEvent to CarRentedReply in car-rental-service
-[ ] Update all references in car-rental-service (handler, tests)
-[ ] Update all references in trip-booking-service
-[ ] Run gradle check
-[ ] Commit changes
+[x] Rename class CarRentedEvent to CarRentedReply in car-rental-service
+[x] Update all references in car-rental-service (handler, tests)
+[x] Update all references in trip-booking-service
+[x] Run gradle check
+[x] Commit changes
 
 ### 6.4 Rename trip-booking-service internal event classes
 [ ] Rename FlightBookedEvent to FlightBookedReply in trip-booking-service messaging package
