@@ -1,3 +1,12 @@
+// Disable Spring Boot's bootJar task since this is a utility library, not an application
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.springframework.kafka:spring-kafka-test'
