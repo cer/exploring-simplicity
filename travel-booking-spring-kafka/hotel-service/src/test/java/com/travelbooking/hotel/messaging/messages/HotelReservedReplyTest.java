@@ -5,16 +5,16 @@ import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class HotelReservedEventTest {
+class HotelReservedReplyTest {
 
     @Test
-    void shouldCreateHotelReservedEventWithAllFields() {
+    void shouldCreateHotelReservedReplyWithAllFields() {
         String correlationId = "trip-123";
         String reservationId = "res-456";
         String confirmationNumber = "HR-789012";
         BigDecimal totalPrice = new BigDecimal("1050.00");
 
-        HotelReservedEvent event = new HotelReservedEvent(
+        HotelReservedReply event = new HotelReservedReply(
             correlationId,
             reservationId,
             confirmationNumber,

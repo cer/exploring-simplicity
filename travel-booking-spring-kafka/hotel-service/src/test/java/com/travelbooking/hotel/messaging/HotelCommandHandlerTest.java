@@ -1,7 +1,7 @@
 package com.travelbooking.hotel.messaging;
 
 import com.travelbooking.hotel.domain.HotelReservation;
-import com.travelbooking.hotel.messaging.messages.HotelReservedEvent;
+import com.travelbooking.hotel.messaging.messages.HotelReservedReply;
 import com.travelbooking.hotel.messaging.messages.ReserveHotelCommand;
 import com.travelbooking.hotel.service.HotelReservationService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -70,10 +70,10 @@ class HotelCommandHandlerTest {
 
         verify(hotelReservationService).reserveHotel(travelerId, hotelName, checkInDate, checkOutDate);
         
-        ArgumentCaptor<HotelReservedEvent> eventCaptor = ArgumentCaptor.forClass(HotelReservedEvent.class);
+        ArgumentCaptor<HotelReservedReply> eventCaptor = ArgumentCaptor.forClass(HotelReservedReply.class);
         verify(kafkaTemplate).send(eq("hotel-service-replies"), eq(correlationId), eventCaptor.capture());
         
-        HotelReservedEvent event = eventCaptor.getValue();
+        HotelReservedReply event = eventCaptor.getValue();
         assertThat(event.correlationId()).isEqualTo(correlationId);
         assertThat(event.reservationId()).isEqualTo(reservation.getId().toString());
         assertThat(event.confirmationNumber()).isEqualTo(reservation.getConfirmationNumber());

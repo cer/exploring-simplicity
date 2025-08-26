@@ -2,7 +2,7 @@ package com.travelbooking.hotel;
 
 import com.travelbooking.hotel.domain.HotelReservation;
 import com.travelbooking.hotel.domain.HotelReservationRepository;
-import com.travelbooking.hotel.messaging.messages.HotelReservedEvent;
+import com.travelbooking.hotel.messaging.messages.HotelReservedReply;
 import com.travelbooking.hotel.messaging.messages.ReserveHotelCommand;
 import com.travelbooking.testutils.kafka.TestConsumer;
 import com.travelbooking.testutils.kafka.TestConsumerConfiguration;
@@ -67,7 +67,7 @@ class HotelServiceIntegrationTest {
     @Autowired
     private TestConsumer testConsumer;
     
-    private TestSubscription<String, HotelReservedEvent> testSubscription;
+    private TestSubscription<String, HotelReservedReply> testSubscription;
 
     @Test
     void shouldProcessHotelReservationSuccessfully() throws Exception {
@@ -87,14 +87,14 @@ class HotelServiceIntegrationTest {
         );
 
         // Setup consumer for replies
-        testSubscription = testConsumer.subscribeForJSon("hotel-service-replies", HotelReservedEvent.class);
+        testSubscription = testConsumer.subscribeForJSon("hotel-service-replies", HotelReservedReply.class);
 
         // When
         kafkaTemplate.send("hotel-service-commands", correlationId, command).get();
 
         // Then - verify reply event
         testSubscription.assertRecordReceived(record -> {
-            HotelReservedEvent event = record.value();
+            HotelReservedReply event = record.value();
             assertThat(event.correlationId()).isEqualTo(correlationId);
             assertThat(event.reservationId()).isNotNull();
             assertThat(event.confirmationNumber())

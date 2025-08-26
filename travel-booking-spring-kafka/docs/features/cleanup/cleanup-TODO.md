@@ -64,11 +64,11 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 [x] Commit changes
 
 ### 6.2 Rename HotelBookedEvent to HotelBookedReply  
-[ ] Rename class HotelBookedEvent to HotelBookedReply in hotel-service
-[ ] Update all references in hotel-service (handler, tests)
-[ ] Update all references in trip-booking-service
-[ ] Run gradle check
-[ ] Commit changes
+[x] Rename class HotelReservedEvent to HotelReservedReply in hotel-service
+[x] Update all references in hotel-service (handler, tests)
+[x] Update all references in trip-booking-service
+[x] Run gradle check
+[x] Commit changes
 
 ### 6.3 Rename CarRentedEvent to CarRentedReply
 [ ] Rename class CarRentedEvent to CarRentedReply in car-rental-service

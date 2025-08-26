@@ -1,7 +1,7 @@
 package com.travelbooking.hotel.messaging;
 
 import com.travelbooking.hotel.domain.HotelReservation;
-import com.travelbooking.hotel.messaging.messages.HotelReservedEvent;
+import com.travelbooking.hotel.messaging.messages.HotelReservedReply;
 import com.travelbooking.hotel.messaging.messages.ReserveHotelCommand;
 import com.travelbooking.hotel.service.HotelReservationService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -48,7 +48,7 @@ public class HotelCommandHandler {
                 command.checkOutDate()
             );
             
-            HotelReservedEvent event = new HotelReservedEvent(
+            HotelReservedReply event = new HotelReservedReply(
                 command.correlationId(),
                 reservation.getId().toString(),
                 reservation.getConfirmationNumber(),

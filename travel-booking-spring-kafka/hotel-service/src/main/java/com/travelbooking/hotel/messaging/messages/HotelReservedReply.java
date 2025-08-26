@@ -2,7 +2,7 @@ package com.travelbooking.hotel.messaging.messages;
 
 import java.math.BigDecimal;
 
-public record HotelReservedEvent(
+public record HotelReservedReply(
     String correlationId,
     String reservationId,
     String confirmationNumber,
