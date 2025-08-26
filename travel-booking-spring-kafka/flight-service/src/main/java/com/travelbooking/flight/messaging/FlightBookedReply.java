@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public record FlightBookedEvent(
+public record FlightBookedReply(
     UUID correlationId,
     UUID bookingId,
     String confirmationNumber,
@@ -19,7 +19,7 @@ public record FlightBookedEvent(
     BigDecimal price
 ) {
     @JsonCreator
-    public FlightBookedEvent(
+    public FlightBookedReply(
             @JsonProperty("correlationId") UUID correlationId,
             @JsonProperty("bookingId") UUID bookingId,
             @JsonProperty("confirmationNumber") String confirmationNumber,

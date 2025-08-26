@@ -3,7 +3,7 @@ package com.travelbooking.flight.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.travelbooking.flight.domain.FlightBooking;
 import com.travelbooking.flight.messaging.BookFlightCommand;
-import com.travelbooking.flight.messaging.FlightBookedEvent;
+import com.travelbooking.flight.messaging.FlightBookedReply;
 import com.travelbooking.flight.service.FlightBookingService;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;

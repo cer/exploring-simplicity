@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.travelbooking.common.Constants;
 import com.travelbooking.flight.domain.FlightBooking;
 import com.travelbooking.flight.messaging.BookFlightCommand;
-import com.travelbooking.flight.messaging.FlightBookedEvent;
+import com.travelbooking.flight.messaging.FlightBookedReply;
 import com.travelbooking.flight.service.FlightBookingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public class FlightCommandHandler {
             logger.info("Flight booking created successfully with ID: {} and confirmation: {}", 
                 booking.getId(), booking.getConfirmationNumber());
 
-            FlightBookedEvent event = new FlightBookedEvent(
+            FlightBookedReply event = new FlightBookedReply(
                 command.correlationId(),
                 booking.getId(),
                 booking.getConfirmationNumber(),

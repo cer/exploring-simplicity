@@ -9,12 +9,12 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FlightBookedEventTest {
+class FlightBookedReplyTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @Test
-    void shouldCreateFlightBookedEventWithAllFields() {
+    void shouldCreateFlightBookedReplyWithAllFields() {
         UUID correlationId = UUID.randomUUID();
         UUID bookingId = UUID.randomUUID();
         String confirmationNumber = "FL-123456";
@@ -25,7 +25,7 @@ class FlightBookedEventTest {
         LocalDate returnDate = LocalDate.of(2024, 6, 20);
         BigDecimal price = new BigDecimal("500.00");
 
-        FlightBookedEvent event = new FlightBookedEvent(
+        FlightBookedReply event = new FlightBookedReply(
             correlationId, bookingId, confirmationNumber, travelerId, 
             from, to, departureDate, returnDate, price
         );
@@ -42,7 +42,7 @@ class FlightBookedEventTest {
     }
 
     @Test
-    void shouldCreateOneWayFlightBookedEvent() {
+    void shouldCreateOneWayFlightBookedReply() {
         UUID correlationId = UUID.randomUUID();
         UUID bookingId = UUID.randomUUID();
         String confirmationNumber = "FL-123456";
@@ -52,7 +52,7 @@ class FlightBookedEventTest {
         LocalDate departureDate = LocalDate.of(2024, 6, 15);
         BigDecimal price = new BigDecimal("300.00");
 
-        FlightBookedEvent event = new FlightBookedEvent(
+        FlightBookedReply event = new FlightBookedReply(
             correlationId, bookingId, confirmationNumber, travelerId, 
             from, to, departureDate, null, price
         );
@@ -80,13 +80,13 @@ class FlightBookedEventTest {
         LocalDate returnDate = LocalDate.of(2024, 6, 20);
         BigDecimal price = new BigDecimal("500.00");
 
-        FlightBookedEvent originalEvent = new FlightBookedEvent(
+        FlightBookedReply originalEvent = new FlightBookedReply(
             correlationId, bookingId, confirmationNumber, travelerId, 
             from, to, departureDate, returnDate, price
         );
 
         String json = objectMapper.writeValueAsString(originalEvent);
-        FlightBookedEvent deserializedEvent = objectMapper.readValue(json, FlightBookedEvent.class);
+        FlightBookedReply deserializedEvent = objectMapper.readValue(json, FlightBookedReply.class);
 
         assertEquals(originalEvent, deserializedEvent);
     }
@@ -103,12 +103,12 @@ class FlightBookedEventTest {
         LocalDate returnDate = LocalDate.of(2024, 6, 20);
         BigDecimal price = new BigDecimal("500.00");
 
-        FlightBookedEvent event1 = new FlightBookedEvent(
+        FlightBookedReply event1 = new FlightBookedReply(
             correlationId, bookingId, confirmationNumber, travelerId, 
             from, to, departureDate, returnDate, price
         );
 
-        FlightBookedEvent event2 = new FlightBookedEvent(
+        FlightBookedReply event2 = new FlightBookedReply(
             correlationId, bookingId, confirmationNumber, travelerId, 
             from, to, departureDate, returnDate, price
         );
@@ -129,14 +129,14 @@ class FlightBookedEventTest {
         LocalDate returnDate = LocalDate.of(2024, 6, 20);
         BigDecimal price = new BigDecimal("500.00");
 
-        FlightBookedEvent event = new FlightBookedEvent(
+        FlightBookedReply event = new FlightBookedReply(
             correlationId, bookingId, confirmationNumber, travelerId, 
             from, to, departureDate, returnDate, price
         );
 
         String toString = event.toString();
         assertNotNull(toString);
-        assertTrue(toString.contains("FlightBookedEvent"));
+        assertTrue(toString.contains("FlightBookedReply"));
         assertTrue(toString.contains(correlationId.toString()));
         assertTrue(toString.contains(bookingId.toString()));
         assertTrue(toString.contains(confirmationNumber));

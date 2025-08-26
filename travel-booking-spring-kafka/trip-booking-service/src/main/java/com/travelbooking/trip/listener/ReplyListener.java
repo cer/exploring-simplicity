@@ -2,7 +2,7 @@ package com.travelbooking.trip.listener;
 
 import com.travelbooking.common.Constants;
 import com.travelbooking.trip.messaging.CarRentedEvent;
-import com.travelbooking.trip.messaging.FlightBookedEvent;
+import com.travelbooking.trip.messaging.FlightBookedReply;
 import com.travelbooking.trip.messaging.HotelReservedEvent;
 import com.travelbooking.trip.orchestrator.TripBookingOrchestrator;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public class ReplyListener {
 
     @KafkaListener(topics = Constants.Topics.FLIGHT_SERVICE_REPLIES, 
                    groupId = Constants.ConsumerGroups.TRIP_BOOKING_GROUP)
-    public void handleFlightReply(FlightBookedEvent event) {
+    public void handleFlightReply(FlightBookedReply event) {
         logger.info("Received flight booked event for correlation ID: {}", event.correlationId());
         orchestrator.handleFlightBooked(event.correlationId(), event.bookingId(), event.price());
     }

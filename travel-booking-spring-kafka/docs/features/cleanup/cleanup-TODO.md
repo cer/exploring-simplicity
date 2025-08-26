@@ -57,11 +57,11 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 ## 6. Rename command reply classes from *Event to *Reply
 
 ### 6.1 Rename FlightBookedEvent to FlightBookedReply
-[ ] Rename class FlightBookedEvent to FlightBookedReply in flight-service
-[ ] Update all references in flight-service (handler, tests)
-[ ] Update all references in trip-booking-service
-[ ] Run gradle check
-[ ] Commit changes
+[x] Rename class FlightBookedEvent to FlightBookedReply in flight-service
+[x] Update all references in flight-service (handler, tests)
+[x] Update all references in trip-booking-service
+[x] Run gradle check
+[x] Commit changes
 
 ### 6.2 Rename HotelBookedEvent to HotelBookedReply  
 [ ] Rename class HotelBookedEvent to HotelBookedReply in hotel-service

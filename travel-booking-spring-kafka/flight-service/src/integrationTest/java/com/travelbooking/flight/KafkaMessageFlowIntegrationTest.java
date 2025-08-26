@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.travelbooking.common.Constants;
 import com.travelbooking.flight.messaging.BookFlightCommand;
-import com.travelbooking.flight.messaging.FlightBookedEvent;
+import com.travelbooking.flight.messaging.FlightBookedReply;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -109,7 +109,7 @@ public class KafkaMessageFlowIntegrationTest {
         producer.send(new ProducerRecord<>(Constants.Topics.FLIGHT_SERVICE_COMMANDS, correlationId.toString(), commandJson)).get();
 
         // Then - Wait for and verify the event
-        AtomicReference<FlightBookedEvent> receivedEvent = new AtomicReference<>();
+        AtomicReference<FlightBookedReply> receivedEvent = new AtomicReference<>();
         
         await().atMost(Duration.ofSeconds(10))
                 .until(() -> {
@@ -117,7 +117,7 @@ public class KafkaMessageFlowIntegrationTest {
                     if (records.count() > 0) {
                         records.forEach(record -> {
                             try {
-                                FlightBookedEvent event = objectMapper.readValue(record.value(), FlightBookedEvent.class);
+                                FlightBookedReply event = objectMapper.readValue(record.value(), FlightBookedReply.class);
                                 receivedEvent.set(event);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
@@ -128,7 +128,7 @@ public class KafkaMessageFlowIntegrationTest {
                     return false;
                 });
 
-        FlightBookedEvent event = receivedEvent.get();
+        FlightBookedReply event = receivedEvent.get();
         assertThat(event).isNotNull();
         assertThat(event.correlationId()).isEqualTo(correlationId);
         assertThat(event.bookingId()).isNotNull();
@@ -239,7 +239,7 @@ public class KafkaMessageFlowIntegrationTest {
         producer.send(new ProducerRecord<>(Constants.Topics.FLIGHT_SERVICE_COMMANDS, correlationId.toString(), commandJson)).get();
 
         // Then
-        AtomicReference<FlightBookedEvent> receivedEvent = new AtomicReference<>();
+        AtomicReference<FlightBookedReply> receivedEvent = new AtomicReference<>();
         
         await().atMost(Duration.ofSeconds(10))
                 .until(() -> {
@@ -247,7 +247,7 @@ public class KafkaMessageFlowIntegrationTest {
                     if (records.count() > 0) {
                         records.forEach(record -> {
                             try {
-                                FlightBookedEvent event = objectMapper.readValue(record.value(), FlightBookedEvent.class);
+                                FlightBookedReply event = objectMapper.readValue(record.value(), FlightBookedReply.class);
                                 receivedEvent.set(event);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
