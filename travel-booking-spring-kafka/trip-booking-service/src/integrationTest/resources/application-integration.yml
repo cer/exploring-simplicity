@@ -35,4 +35,8 @@ spring:
 logging:
   level:
     com.travelbooking: DEBUG
-    org.springframework.kafka: DEBUG
+    org.springframework.kafka: WARN
+    org.apache.kafka: WARN
+    kafka: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %-5level - %c{1} - %msg%n"

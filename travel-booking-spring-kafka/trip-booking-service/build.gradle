@@ -2,6 +2,7 @@ apply plugin: 'IntegrationTestsPlugin'
 
 dependencies {
     implementation project(':common')
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation 'com.h2database:h2'
     integrationTestImplementation project(':test-utils')
     integrationTestImplementation 'org.springframework.kafka:spring-kafka-test'

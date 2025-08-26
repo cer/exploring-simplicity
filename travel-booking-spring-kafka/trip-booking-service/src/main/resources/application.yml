@@ -42,5 +42,8 @@ management:
 logging:
   level:
     com.travelbooking: DEBUG
+    org.springframework.kafka: WARN
+    org.apache.kafka: WARN
+    kafka: WARN
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg [correlationId=%X{correlationId}]%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %c{1} - %msg [correlationId=%X{correlationId}]%n"

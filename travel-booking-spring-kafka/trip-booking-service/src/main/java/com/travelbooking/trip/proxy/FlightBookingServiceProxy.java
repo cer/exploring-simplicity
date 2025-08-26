@@ -2,6 +2,8 @@ package com.travelbooking.trip.proxy;
 
 import com.travelbooking.common.Constants;
 import com.travelbooking.trip.messaging.BookFlightCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +13,7 @@ import java.util.UUID;
 @Component
 public class FlightBookingServiceProxy {
 
+    private static final Logger logger = LoggerFactory.getLogger(FlightBookingServiceProxy.class);
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public FlightBookingServiceProxy(KafkaTemplate<String, Object> kafkaTemplate) {
@@ -28,6 +31,8 @@ public class FlightBookingServiceProxy {
             returnDate
         );
         
+        logger.info("Sending flight booking command to topic {} for correlation ID: {}", 
+                    Constants.Topics.FLIGHT_SERVICE_COMMANDS, correlationId);
         kafkaTemplate.send(Constants.Topics.FLIGHT_SERVICE_COMMANDS, correlationId.toString(), command);
     }
 }

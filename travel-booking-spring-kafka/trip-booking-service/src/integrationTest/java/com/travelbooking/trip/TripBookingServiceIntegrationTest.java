@@ -87,7 +87,7 @@ class TripBookingServiceIntegrationTest {
     private TestSubscription<String, RentCarCommand> carCommandSubscription;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws InterruptedException {
         // Set up KafkaTemplate for sending reply messages
         Map<String, Object> producerProps = KafkaTestUtils.producerProps(kafka.getBootstrapServers());
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -102,6 +102,9 @@ class TripBookingServiceIntegrationTest {
         flightCommandSubscription = testConsumer.subscribeForJSon(Constants.Topics.FLIGHT_SERVICE_COMMANDS, BookFlightCommand.class);
         hotelCommandSubscription = testConsumer.subscribeForJSon(Constants.Topics.HOTEL_SERVICE_COMMANDS, ReserveHotelCommand.class);
         carCommandSubscription = testConsumer.subscribeForJSon(Constants.Topics.CAR_SERVICE_COMMANDS, RentCarCommand.class);
+        
+        // Give consumers time to fully subscribe to topics
+        Thread.sleep(2000);
     }
 
     @AfterEach
@@ -170,8 +173,8 @@ class TripBookingServiceIntegrationTest {
         // Verify hotel command was sent
         hotelCommandSubscription.assertRecordReceived(record -> {
             ReserveHotelCommand hotelCommand = record.value();
-            assertThat(hotelCommand.correlationId()).isEqualTo(sagaId.toString());
-            assertThat(hotelCommand.travelerId()).isEqualTo(travelerId.toString());
+            assertThat(hotelCommand.correlationId()).isEqualTo(sagaId);
+            assertThat(hotelCommand.travelerId()).isEqualTo(travelerId);
             assertThat(hotelCommand.hotelName()).isEqualTo("Hilton LAX");
         });
 
@@ -193,8 +196,8 @@ class TripBookingServiceIntegrationTest {
         // Verify car command was sent
         carCommandSubscription.assertRecordReceived(record -> {
             RentCarCommand carCommand = record.value();
-            assertThat(carCommand.correlationId()).isEqualTo(sagaId.toString());
-            assertThat(carCommand.travelerId()).isEqualTo(travelerId.toString());
+            assertThat(carCommand.correlationId()).isEqualTo(sagaId);
+            assertThat(carCommand.travelerId()).isEqualTo(travelerId);
             assertThat(carCommand.pickupLocation()).isEqualTo("LAX Airport");
             assertThat(carCommand.dropoffLocation()).isEqualTo("LAX Airport");
             assertThat(carCommand.carType()).isEqualTo("SEDAN");
@@ -283,8 +286,8 @@ class TripBookingServiceIntegrationTest {
         // Verify hotel command was sent
         hotelCommandSubscription.assertRecordReceived(record -> {
             ReserveHotelCommand hotelCommand = record.value();
-            assertThat(hotelCommand.correlationId()).isEqualTo(sagaId.toString());
-            assertThat(hotelCommand.travelerId()).isEqualTo(travelerId.toString());
+            assertThat(hotelCommand.correlationId()).isEqualTo(sagaId);
+            assertThat(hotelCommand.travelerId()).isEqualTo(travelerId);
             assertThat(hotelCommand.hotelName()).isEqualTo("Hilton LAX");
         });
 
@@ -332,8 +335,8 @@ class TripBookingServiceIntegrationTest {
             url, invalidRequest, TripBookingController.TripBookingResponse.class
         );
 
-        // Then - Should still create (no validation enforced yet)
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        // Then - Should return bad request due to validation
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test

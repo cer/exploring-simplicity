@@ -55,7 +55,7 @@ public class TestConsumer {
     var consumer = new DefaultKafkaConsumerFactory<>(consumerProps, keyDeserializer, valueDeserializer)
         .createConsumer();
     consumer.subscribe(Collections.singletonList(topic));
-    return new TestSubscription<>(consumer);
+    return new TestSubscription<>(consumer, topic);
   }
 
   public TestSubscription<String, String> subscribe(String topic) {
@@ -88,6 +88,6 @@ public class TestConsumer {
     var consumer = new DefaultKafkaConsumerFactory<>(consumerProps, new StringDeserializer(), new JsonDeserializer<>(messageClass))
         .createConsumer();
     consumer.subscribe(Collections.singletonList(topic));
-    return new TestSubscription<>(consumer);
+    return new TestSubscription<>(consumer, topic);
   }
 }

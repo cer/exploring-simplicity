@@ -7,3 +7,5 @@
 - IMPORTANT do not disable pre-commit hooks
 - integration tests should be in src/integrationTests using (apply plugin: IntegrationTestsPlugin)
 - IMPORTANT do not disable tests
+- IMPORTANT Do nor run gradlew with extra options to to see the actual failure messages. Instead look at the TEST*.xml files.
+- IMPORTANT Do not run gradlew with extra options to to see the actual failure messages. Instead look at the TEST*.xml files.

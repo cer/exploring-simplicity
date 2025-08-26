@@ -97,6 +97,8 @@ public class TripBookingOrchestrator {
                 originalRequest.carType(),
                 originalRequest.discountCode()
             );
+        } else {
+            logger.info("Saga {} completed without car rental", sagaId);
         }
     }
     
@@ -108,5 +110,6 @@ public class TripBookingOrchestrator {
             .orElseThrow(() -> new IllegalStateException("Saga not found: " + sagaId));
         
         wipItinerary.noteCarRented(carRentalId, carPrice);
+        logger.info("Saga {} completed with car rental", sagaId);
     }
 }
