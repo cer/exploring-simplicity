@@ -78,13 +78,13 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 [x] Commit changes
 
 ### 6.4 Rename trip-booking-service internal event classes
-[ ] Rename FlightBookedEvent to FlightBookedReply in trip-booking-service messaging package
-[ ] Rename HotelReservedEvent to HotelReservedReply in trip-booking-service messaging package
-[ ] Rename CarRentedEvent to CarRentedReply in trip-booking-service messaging package
-[ ] Update all references in TripBookingServiceIntegrationTest
-[ ] Update all references in event handlers
-[ ] Run gradle check
-[ ] Commit changes
+[x] Rename FlightBookedEvent to FlightBookedReply in trip-booking-service messaging package
+[x] Rename HotelReservedEvent to HotelReservedReply in trip-booking-service messaging package
+[x] Rename CarRentedEvent to CarRentedReply in trip-booking-service messaging package
+[x] Update all references in TripBookingServiceIntegrationTest
+[x] Update all references in event handlers
+[x] Run gradle check
+[x] Commit changes
 
 ## 7. Clean up WipItinerary redundant constructor and field
 [x] Remove WipItinerary(UUID sagaId, UUID travelerId) constructor
