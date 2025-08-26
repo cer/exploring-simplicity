@@ -47,12 +47,12 @@ Note: Found in TripBookingOrchestrator - entities retrieved by findById() don't 
 [x] Add validation and error handling tests
 
 ## 5. Verify command message is sent before simulating reply (TripBookingServiceIntegrationTest only)
-[ ] Create TestSubscription helper to verify message was sent to command topic
-[ ] Add verification in testCompleteHappyPathWithAllServices() before simulating FlightBookedEvent
-[ ] Add verification in testCompleteHappyPathWithAllServices() before simulating HotelReservedEvent
-[ ] Add verification in testCompleteHappyPathWithAllServices() before simulating CarRentedEvent
-[ ] Add verification in testHappyPathWithoutCarRental() before simulating FlightBookedEvent
-[ ] Add verification in testHappyPathWithoutCarRental() before simulating HotelReservedEvent
+[x] Create TestSubscription helper to verify message was sent to command topic
+[x] Add verification in testCompleteHappyPathWithAllServices() before simulating FlightBookedReply
+[x] Add verification in testCompleteHappyPathWithAllServices() before simulating HotelReservedReply
+[x] Add verification in testCompleteHappyPathWithAllServices() before simulating CarRentedReply
+[x] Add verification in testHappyPathWithoutCarRental() before simulating FlightBookedReply
+[x] Add verification in testHappyPathWithoutCarRental() before simulating HotelReservedReply
 
 ## 6. Rename command reply classes from *Event to *Reply
 

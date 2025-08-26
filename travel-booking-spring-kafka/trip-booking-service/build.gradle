@@ -3,6 +3,7 @@ apply plugin: 'IntegrationTestsPlugin'
 dependencies {
     implementation project(':common')
     testImplementation 'com.h2database:h2'
+    integrationTestImplementation project(':test-utils')
     integrationTestImplementation 'org.springframework.kafka:spring-kafka-test'
     integrationTestImplementation 'org.testcontainers:kafka'
     integrationTestImplementation 'org.testcontainers:postgresql'

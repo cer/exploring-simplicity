@@ -1,10 +1,23 @@
 package com.travelbooking.trip;
 
+import com.travelbooking.common.Constants;
 import com.travelbooking.trip.controller.TripBookingController;
 import com.travelbooking.trip.domain.TripRequest;
 import com.travelbooking.trip.domain.WipItinerary;
+import com.travelbooking.trip.messaging.BookFlightCommand;
+import com.travelbooking.trip.messaging.CarRentedReply;
+import com.travelbooking.trip.messaging.FlightBookedReply;
+import com.travelbooking.trip.messaging.HotelReservedReply;
+import com.travelbooking.trip.messaging.RentCarCommand;
+import com.travelbooking.trip.messaging.ReserveHotelCommand;
 import com.travelbooking.trip.orchestrator.SagaState;
 import com.travelbooking.trip.repository.WipItineraryRepository;
+import com.travelbooking.testutils.kafka.TestConsumer;
+import com.travelbooking.testutils.kafka.TestSubscription;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +25,11 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -21,11 +39,15 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
@@ -58,6 +80,37 @@ class TripBookingServiceIntegrationTest {
     @Autowired
     private WipItineraryRepository repository;
 
+    private KafkaTemplate<String, Object> kafkaTemplate;
+    private TestConsumer testConsumer;
+    private TestSubscription<String, BookFlightCommand> flightCommandSubscription;
+    private TestSubscription<String, ReserveHotelCommand> hotelCommandSubscription;
+    private TestSubscription<String, RentCarCommand> carCommandSubscription;
+
+    @BeforeEach
+    void setUp() {
+        // Set up KafkaTemplate for sending reply messages
+        Map<String, Object> producerProps = KafkaTestUtils.producerProps(kafka.getBootstrapServers());
+        producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        ProducerFactory<String, Object> producerFactory = new DefaultKafkaProducerFactory<>(producerProps);
+        kafkaTemplate = new KafkaTemplate<>(producerFactory);
+
+        // Create TestConsumer with KafkaContainer's bootstrap servers
+        testConsumer = new TestConsumer(kafka.getBootstrapServers());
+        
+        // Set up test subscriptions for command verification
+        flightCommandSubscription = testConsumer.subscribeForJSon(Constants.Topics.FLIGHT_SERVICE_COMMANDS, BookFlightCommand.class);
+        hotelCommandSubscription = testConsumer.subscribeForJSon(Constants.Topics.HOTEL_SERVICE_COMMANDS, ReserveHotelCommand.class);
+        carCommandSubscription = testConsumer.subscribeForJSon(Constants.Topics.CAR_SERVICE_COMMANDS, RentCarCommand.class);
+    }
+
+    @AfterEach
+    void tearDown() {
+        TestSubscription.closeQuietly(flightCommandSubscription);
+        TestSubscription.closeQuietly(hotelCommandSubscription);
+        TestSubscription.closeQuietly(carCommandSubscription);
+    }
+
     @Test
     void testCompleteHappyPathWithAllServices() {
         // Given
@@ -89,9 +142,87 @@ class TripBookingServiceIntegrationTest {
         assertThat(initialSaga).isPresent();
         assertThat(initialSaga.get().getState()).isEqualTo(SagaState.STARTED);
 
-        // TODO: Task 5 - Add verification that command messages were sent before simulating replies
-        // For now, just verify the saga was created properly
-        // The Kafka event simulation will be added in Task 5 with proper TestSubscription helper
+        // Task 5: Verify command message is sent before simulating reply
+        // Verify flight command was sent
+        flightCommandSubscription.assertRecordReceived(record -> {
+            BookFlightCommand flightCommand = record.value();
+            assertThat(flightCommand.correlationId()).isEqualTo(sagaId);
+            assertThat(flightCommand.travelerId()).isEqualTo(travelerId);
+            assertThat(flightCommand.from()).isEqualTo("NYC");
+            assertThat(flightCommand.to()).isEqualTo("LAX");
+        });
+
+        // Simulate flight service response
+        FlightBookedReply flightReply = new FlightBookedReply(
+            sagaId,
+            UUID.randomUUID(),
+            "FL-123456",
+            new BigDecimal("500.00")
+        );
+        kafkaTemplate.send(Constants.Topics.FLIGHT_SERVICE_REPLIES, sagaId.toString(), flightReply);
+
+        // Wait for flight to be processed
+        await().atMost(10, TimeUnit.SECONDS).until(() -> {
+            Optional<WipItinerary> saga = repository.findById(sagaId);
+            return saga.isPresent() && saga.get().getState() == SagaState.FLIGHT_BOOKED;
+        });
+
+        // Verify hotel command was sent
+        hotelCommandSubscription.assertRecordReceived(record -> {
+            ReserveHotelCommand hotelCommand = record.value();
+            assertThat(hotelCommand.correlationId()).isEqualTo(sagaId.toString());
+            assertThat(hotelCommand.travelerId()).isEqualTo(travelerId.toString());
+            assertThat(hotelCommand.hotelName()).isEqualTo("Hilton LAX");
+        });
+
+        // Simulate hotel service response
+        HotelReservedReply hotelReply = new HotelReservedReply(
+            sagaId,
+            UUID.randomUUID(),
+            "HT-789012",
+            new BigDecimal("700.00")
+        );
+        kafkaTemplate.send(Constants.Topics.HOTEL_SERVICE_REPLIES, sagaId.toString(), hotelReply);
+
+        // Wait for hotel to be processed
+        await().atMost(10, TimeUnit.SECONDS).until(() -> {
+            Optional<WipItinerary> saga = repository.findById(sagaId);
+            return saga.isPresent() && saga.get().getState() == SagaState.HOTEL_RESERVED;
+        });
+
+        // Verify car command was sent
+        carCommandSubscription.assertRecordReceived(record -> {
+            RentCarCommand carCommand = record.value();
+            assertThat(carCommand.correlationId()).isEqualTo(sagaId.toString());
+            assertThat(carCommand.travelerId()).isEqualTo(travelerId.toString());
+            assertThat(carCommand.pickupLocation()).isEqualTo("LAX Airport");
+            assertThat(carCommand.dropoffLocation()).isEqualTo("LAX Airport");
+            assertThat(carCommand.carType()).isEqualTo("SEDAN");
+        });
+
+        // Simulate car rental service response
+        CarRentedReply carReply = new CarRentedReply(
+            sagaId,
+            UUID.randomUUID(),
+            "CR-345678",
+            new BigDecimal("300.00")
+        );
+        kafkaTemplate.send(Constants.Topics.CAR_SERVICE_REPLIES, sagaId.toString(), carReply);
+
+        // Wait for saga to complete
+        await().atMost(10, TimeUnit.SECONDS).until(() -> {
+            Optional<WipItinerary> saga = repository.findById(sagaId);
+            return saga.isPresent() && saga.get().getState() == SagaState.COMPLETED;
+        });
+
+        // Verify final state
+        Optional<WipItinerary> completedSaga = repository.findById(sagaId);
+        assertThat(completedSaga).isPresent();
+        assertThat(completedSaga.get().getState()).isEqualTo(SagaState.COMPLETED);
+        assertThat(completedSaga.get().getFlightBookingId()).isNotNull();
+        assertThat(completedSaga.get().getHotelReservationId()).isNotNull();
+        assertThat(completedSaga.get().getCarRentalId()).isNotNull();
+        assertThat(completedSaga.get().getTotalCost()).isNotNull();
     }
 
     @Test
@@ -124,9 +255,62 @@ class TripBookingServiceIntegrationTest {
         assertThat(initialSaga).isPresent();
         assertThat(initialSaga.get().getState()).isEqualTo(SagaState.STARTED);
 
-        // TODO: Task 5 - Add verification that command messages were sent before simulating replies
-        // For now, just verify the saga was created properly without car rental info
-        // The Kafka event simulation will be added in Task 5 with proper TestSubscription helper
+        // Task 5: Verify command message is sent before simulating reply
+        // Verify flight command was sent
+        flightCommandSubscription.assertRecordReceived(record -> {
+            BookFlightCommand flightCommand = record.value();
+            assertThat(flightCommand.correlationId()).isEqualTo(sagaId);
+            assertThat(flightCommand.travelerId()).isEqualTo(travelerId);
+            assertThat(flightCommand.from()).isEqualTo("NYC");
+            assertThat(flightCommand.to()).isEqualTo("LAX");
+        });
+
+        // Simulate flight service response
+        FlightBookedReply flightReply = new FlightBookedReply(
+            sagaId,
+            UUID.randomUUID(),
+            "FL-123456",
+            new BigDecimal("500.00")
+        );
+        kafkaTemplate.send(Constants.Topics.FLIGHT_SERVICE_REPLIES, sagaId.toString(), flightReply);
+
+        // Wait for flight to be processed
+        await().atMost(10, TimeUnit.SECONDS).until(() -> {
+            Optional<WipItinerary> saga = repository.findById(sagaId);
+            return saga.isPresent() && saga.get().getState() == SagaState.FLIGHT_BOOKED;
+        });
+
+        // Verify hotel command was sent
+        hotelCommandSubscription.assertRecordReceived(record -> {
+            ReserveHotelCommand hotelCommand = record.value();
+            assertThat(hotelCommand.correlationId()).isEqualTo(sagaId.toString());
+            assertThat(hotelCommand.travelerId()).isEqualTo(travelerId.toString());
+            assertThat(hotelCommand.hotelName()).isEqualTo("Hilton LAX");
+        });
+
+        // Simulate hotel service response
+        HotelReservedReply hotelReply = new HotelReservedReply(
+            sagaId,
+            UUID.randomUUID(),
+            "HT-789012",
+            new BigDecimal("700.00")
+        );
+        kafkaTemplate.send(Constants.Topics.HOTEL_SERVICE_REPLIES, sagaId.toString(), hotelReply);
+
+        // Wait for saga to complete (should complete without car)
+        await().atMost(10, TimeUnit.SECONDS).until(() -> {
+            Optional<WipItinerary> saga = repository.findById(sagaId);
+            return saga.isPresent() && saga.get().getState() == SagaState.COMPLETED;
+        });
+
+        // Verify final state
+        Optional<WipItinerary> completedSaga = repository.findById(sagaId);
+        assertThat(completedSaga).isPresent();
+        assertThat(completedSaga.get().getState()).isEqualTo(SagaState.COMPLETED);
+        assertThat(completedSaga.get().getFlightBookingId()).isNotNull();
+        assertThat(completedSaga.get().getHotelReservationId()).isNotNull();
+        assertThat(completedSaga.get().getCarRentalId()).isNull();
+        assertThat(completedSaga.get().getTotalCost()).isNotNull();
     }
 
     @Test
