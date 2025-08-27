@@ -12,6 +12,8 @@ temporal:
   service-address: localhost:7233
   namespace: default
   task-queue: test-trip-booking-queue
+  worker:
+    enabled: false
 
 logging:
   level:

@@ -77,50 +77,50 @@ Establish the core Temporal workflow structure and worker configuration without 
 ```text
 Create the basic Temporal workflow infrastructure:
 
-[ ] Create TemporalConfig configuration class:
-    [ ] Write test for TemporalConfig bean creation
-    [ ] Create com.travelbooking.trip.temporal.config.TemporalConfig class
-    [ ] Configure WorkflowClient bean with connection to Temporal server
-    [ ] Configure WorkflowServiceStubs bean
-    [ ] Configure WorkerFactory bean
-    [ ] Run tests and ensure configuration loads correctly
+[x] Create TemporalConfig configuration class:
+    [x] Write test for TemporalConfig bean creation
+    [x] Create com.travelbooking.trip.temporal.config.TemporalConfig class
+    [x] Configure WorkflowClient bean with connection to Temporal server
+    [x] Configure WorkflowServiceStubs bean
+    [x] Configure WorkerFactory bean
+    [x] Run tests and ensure configuration loads correctly
 
-[ ] Create TripBookingWorkflow interface:
-    [ ] Write test to verify workflow interface structure
-    [ ] Create com.travelbooking.trip.temporal.workflow.TripBookingWorkflow interface
-    [ ] Add @WorkflowInterface annotation
-    [ ] Define bookTrip method with @WorkflowMethod annotation
-    [ ] Method should accept TripRequest and return a simple String for now
-    [ ] Run tests
+[x] Create TripBookingWorkflow interface:
+    [x] Write test to verify workflow interface structure
+    [x] Create com.travelbooking.trip.temporal.workflow.TripBookingWorkflow interface
+    [x] Add @WorkflowInterface annotation
+    [x] Define bookTrip method with @WorkflowMethod annotation
+    [x] Method should accept TripRequest and return a simple String for now
+    [x] Run tests
 
-[ ] Create TripBookingWorkflowImpl implementation:
-    [ ] Write test using Temporal TestWorkflowEnvironment
-    [ ] Create TripBookingWorkflowImpl class implementing TripBookingWorkflow
-    [ ] Implement bookTrip method returning a placeholder response
-    [ ] Verify workflow executes in test environment
-    [ ] Run all tests
+[x] Create TripBookingWorkflowImpl implementation:
+    [x] Write test using Temporal TestWorkflowEnvironment
+    [x] Create TripBookingWorkflowImpl class implementing TripBookingWorkflow
+    [x] Implement bookTrip method returning a placeholder response
+    [x] Verify workflow executes in test environment
+    [x] Run all tests
 
-[ ] Register workflow with worker:
-    [ ] Write integration test to verify worker registration
-    [ ] Update TemporalConfig to create and start a Worker
-    [ ] Register TripBookingWorkflowImpl with the worker
-    [ ] Configure worker to use "trip-booking-queue" task queue
-    [ ] Start the worker in a @PostConstruct method
-    [ ] Run integration test to verify worker connects to Temporal
+[x] Register workflow with worker:
+    [x] Write integration test to verify worker registration
+    [x] Update TemporalConfig to create and start a Worker
+    [x] Register TripBookingWorkflowImpl with the worker
+    [x] Configure worker to use "trip-booking-queue" task queue
+    [x] Start the worker in a @PostConstruct method
+    [x] Run integration test to verify worker connects to Temporal
 
-[ ] Create simple REST controller for testing:
-    [ ] Write test for TripBookingTemporalController
-    [ ] Create com.travelbooking.trip.temporal.controller.TripBookingTemporalController
-    [ ] Add POST /api/trips endpoint that starts a workflow
-    [ ] Use WorkflowClient to start workflow execution
-    [ ] Return workflow ID as response for now
-    [ ] Run tests
+[x] Create simple REST controller for testing:
+    [x] Write test for TripBookingTemporalController
+    [x] Create com.travelbooking.trip.temporal.controller.TripBookingTemporalController
+    [x] Add POST /api/trips endpoint that starts a workflow
+    [x] Use WorkflowClient to start workflow execution
+    [x] Return workflow ID as response for now
+    [x] Run tests
 
-[ ] Verify end-to-end workflow execution:
-    [ ] Write integration test that calls REST endpoint
-    [ ] Verify workflow starts and completes
-    [ ] Check workflow appears in Temporal UI
-    [ ] Commit working workflow infrastructure
+[x] Verify end-to-end workflow execution:
+    [x] Write integration test that calls REST endpoint
+    [x] Verify workflow starts and completes
+    [x] Check workflow appears in Temporal UI
+    [x] Commit working workflow infrastructure
 ```
 
 ## Steel Thread 3: Booking Activities Interface and Setup
@@ -141,7 +141,7 @@ Create the activities infrastructure for service interactions:
     [ ] Define reserveHotel method with proper parameters
     [ ] Define rentCar method with proper parameters
     [ ] Each method should return appropriate Reply type from common module
-    [ ] Run tests
+    [x] Run tests
 
 [ ] Create BookingActivitiesImpl implementation:
     [ ] Write unit test for BookingActivitiesImpl with mocked Kafka
@@ -191,7 +191,7 @@ Implement Kafka-based flight booking activity:
     [ ] Implement correlation ID to CompletableFuture mapping
     [ ] Add methods to register and complete futures
     [ ] Add timeout handling for uncompleted futures
-    [ ] Run tests
+    [x] Run tests
 
 [ ] Create Kafka reply listener:
     [ ] Write test for KafkaReplyListener
@@ -199,7 +199,7 @@ Implement Kafka-based flight booking activity:
     [ ] Add @KafkaListener for flight-booked-reply topic
     [ ] Deserialize FlightBookedReply messages
     [ ] Complete corresponding CompletableFuture in ReplyCorrelator
-    [ ] Run tests with embedded Kafka
+    [x] Run tests with embedded Kafka
 
 [ ] Implement bookFlight activity with real Kafka:
     [ ] Write integration test for bookFlight with TestContainers Kafka
@@ -243,7 +243,7 @@ Implement hotel and car rental activities following the flight booking pattern:
     [ ] Update KafkaReplyListener to handle hotel-reserved-reply topic
     [ ] Add deserialization for HotelReservedReply
     [ ] Complete futures in ReplyCorrelator for hotel replies
-    [ ] Run tests
+    [x] Run tests
 
 [ ] Implement reserveHotel activity:
     [ ] Write integration test for reserveHotel
@@ -259,7 +259,7 @@ Implement hotel and car rental activities following the flight booking pattern:
     [ ] Update KafkaReplyListener to handle car-rented-reply topic
     [ ] Add deserialization for CarRentedReply
     [ ] Complete futures for car rental replies
-    [ ] Run tests
+    [x] Run tests
 
 [ ] Implement rentCar activity:
     [ ] Write integration test for rentCar
@@ -304,7 +304,7 @@ Create proper response models and ensure API compatibility:
     [ ] Add fields for flightBookingId, hotelReservationId, carRentalId
     [ ] Add constructor, getters, and builder pattern
     [ ] Verify JSON serialization matches original service
-    [ ] Run tests
+    [x] Run tests
 
 [ ] Update workflow to return TripConfirmation:
     [ ] Write test for workflow returning TripConfirmation
