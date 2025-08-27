@@ -10,9 +10,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,8 +66,16 @@ class TripBookingWorkflowWithActivitiesTest {
             "Economy"
         );
         
-        // Set up activity mocks to do nothing (fire and forget)
-        doNothing().when(activities).bookFlight(
+        // Create latches to synchronize activity calls with signal sending
+        CountDownLatch flightBookedLatch = new CountDownLatch(1);
+        CountDownLatch hotelReservedLatch = new CountDownLatch(1);
+        CountDownLatch carRentedLatch = new CountDownLatch(1);
+        
+        // Set up activity mocks to signal when called
+        doAnswer(invocation -> {
+            flightBookedLatch.countDown();
+            return null;
+        }).when(activities).bookFlight(
             any(UUID.class),
             eq(travelerId),
             eq("Seattle"),
@@ -74,7 +84,10 @@ class TripBookingWorkflowWithActivitiesTest {
             any(LocalDate.class)
         );
         
-        doNothing().when(activities).reserveHotel(
+        doAnswer(invocation -> {
+            hotelReservedLatch.countDown();
+            return null;
+        }).when(activities).reserveHotel(
             any(UUID.class),
             eq(travelerId),
             eq("San Francisco"),
@@ -82,7 +95,10 @@ class TripBookingWorkflowWithActivitiesTest {
             any(LocalDate.class)
         );
         
-        doNothing().when(activities).rentCar(
+        doAnswer(invocation -> {
+            carRentedLatch.countDown();
+            return null;
+        }).when(activities).rentCar(
             any(UUID.class),
             eq(travelerId),
             eq("San Francisco"),
@@ -105,29 +121,35 @@ class TripBookingWorkflowWithActivitiesTest {
             request
         );
         
-        // Allow time for workflow to start and call activities
-        Thread.sleep(200);
-        
-        // Send signals to simulate async replies
+        // Wait for and respond to each activity invocation
+        assertThat(flightBookedLatch.await(2, TimeUnit.SECONDS))
+            .describedAs("Flight booking activity should be called")
+            .isTrue();
         workflow.flightBooked(new FlightBookedReply(
             workflowId,
             travelerId,
             "FLIGHT-001",
-            new java.math.BigDecimal("550.00")
+            new BigDecimal("550.00")
         ));
         
+        assertThat(hotelReservedLatch.await(2, TimeUnit.SECONDS))
+            .describedAs("Hotel reservation activity should be called")
+            .isTrue();
         workflow.hotelReserved(new HotelReservedReply(
             workflowId,
             travelerId,
             "HOTEL-002",
-            new java.math.BigDecimal("850.00")
+            new BigDecimal("850.00")
         ));
         
+        assertThat(carRentedLatch.await(2, TimeUnit.SECONDS))
+            .describedAs("Car rental activity should be called")
+            .isTrue();
         workflow.carRented(new CarRentedReply(
             workflowId,
             travelerId,
             "CAR-003",
-            new java.math.BigDecimal("400.00")
+            new BigDecimal("400.00")
         ));
         
         // Wait for workflow completion
@@ -141,7 +163,7 @@ class TripBookingWorkflowWithActivitiesTest {
             .contains("CAR-003");
         
         // Verify all activities were invoked
-        verify(activities, timeout(1000)).bookFlight(
+        verify(activities).bookFlight(
             eq(workflowId),
             eq(travelerId),
             eq("Seattle"),
@@ -150,7 +172,7 @@ class TripBookingWorkflowWithActivitiesTest {
             any(LocalDate.class)
         );
         
-        verify(activities, timeout(1000)).reserveHotel(
+        verify(activities).reserveHotel(
             eq(workflowId),
             eq(travelerId),
             eq("San Francisco"),
@@ -158,7 +180,7 @@ class TripBookingWorkflowWithActivitiesTest {
             any(LocalDate.class)
         );
         
-        verify(activities, timeout(1000)).rentCar(
+        verify(activities).rentCar(
             eq(workflowId),
             eq(travelerId),
             eq("San Francisco"),
@@ -185,8 +207,15 @@ class TripBookingWorkflowWithActivitiesTest {
             null
         );
         
+        // Create latches to synchronize activity calls with signal sending
+        CountDownLatch flightBookedLatch = new CountDownLatch(1);
+        CountDownLatch hotelReservedLatch = new CountDownLatch(1);
+        
         // Set up activity mocks
-        doNothing().when(activities).bookFlight(
+        doAnswer(invocation -> {
+            flightBookedLatch.countDown();
+            return null;
+        }).when(activities).bookFlight(
             any(UUID.class),
             eq(travelerId),
             eq("Miami"),
@@ -195,7 +224,10 @@ class TripBookingWorkflowWithActivitiesTest {
             any(LocalDate.class)
         );
         
-        doNothing().when(activities).reserveHotel(
+        doAnswer(invocation -> {
+            hotelReservedLatch.countDown();
+            return null;
+        }).when(activities).reserveHotel(
             any(UUID.class),
             eq(travelerId),
             eq("Orlando"),
@@ -218,22 +250,25 @@ class TripBookingWorkflowWithActivitiesTest {
             request
         );
         
-        // Allow time for workflow to start
-        Thread.sleep(200);
-        
-        // Send only flight and hotel signals (no car rental)
+        // Wait for and respond to each activity invocation
+        assertThat(flightBookedLatch.await(2, TimeUnit.SECONDS))
+            .describedAs("Flight booking activity should be called")
+            .isTrue();
         workflow.flightBooked(new FlightBookedReply(
             workflowId,
             travelerId,
             "FLIGHT-100",
-            new java.math.BigDecimal("250.00")
+            new BigDecimal("250.00")
         ));
         
+        assertThat(hotelReservedLatch.await(2, TimeUnit.SECONDS))
+            .describedAs("Hotel reservation activity should be called")
+            .isTrue();
         workflow.hotelReserved(new HotelReservedReply(
             workflowId,
             travelerId,
             "HOTEL-200",
-            new java.math.BigDecimal("950.00")
+            new BigDecimal("950.00")
         ));
         
         // Wait for workflow completion
