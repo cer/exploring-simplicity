@@ -185,47 +185,47 @@ Implement complete Kafka messaging for flight booking using Temporal signals for
 ```text
 Implement Kafka-based flight booking with signal pattern:
 
-[ ] Update BookingActivities interface:
-    [ ] Write test for void-returning activity methods
-    [ ] Update bookFlight method to return void
-    [ ] Update reserveHotel method to return void
-    [ ] Update rentCar method to return void
-    [ ] Run tests
+[x] Update BookingActivities interface:
+    [x] Write test for void-returning activity methods
+    [x] Update bookFlight method to return void
+    [x] Update reserveHotel method to return void
+    [x] Update rentCar method to return void
+    [x] Run tests
 
-[ ] Update TripBookingWorkflow interface with signals:
-    [ ] Write test for workflow signal methods
-    [ ] Add @SignalMethod for flightBooked(FlightBookedReply)
-    [ ] Add @SignalMethod for hotelReserved(HotelReservedReply)
-    [ ] Add @SignalMethod for carRented(CarRentedReply)
-    [ ] Run tests
+[x] Update TripBookingWorkflow interface with signals:
+    [x] Write test for workflow signal methods
+    [x] Add @SignalMethod for flightBooked(FlightBookedReply)
+    [x] Add @SignalMethod for hotelReserved(HotelReservedReply)
+    [x] Add @SignalMethod for carRented(CarRentedReply)
+    [x] Run tests
 
-[ ] Implement fire-and-forget activities:
-    [ ] Write test for BookingActivitiesImpl sending commands
-    [ ] Update bookFlight to:
-        [ ] Create BookFlightCommand with workflow ID as correlation ID
-        [ ] Send command to flight-commands topic via KafkaTemplate
-        [ ] Log the command sent
-        [ ] Return immediately (void)
-    [ ] Run tests with embedded Kafka
+[x] Implement fire-and-forget activities:
+    [x] Write test for BookingActivitiesImpl sending commands
+    [x] Update bookFlight to:
+        [x] Create BookFlightCommand with workflow ID as correlation ID
+        [x] Send command to flight-commands topic via KafkaTemplate
+        [x] Log the command sent
+        [x] Return immediately (void)
+    [x] Run tests with embedded Kafka
 
-[ ] Create Kafka reply listener that signals workflows:
-    [ ] Write test for KafkaReplyListener
-    [ ] Create com.travelbooking.trip.temporal.messaging.KafkaReplyListener
-    [ ] Inject WorkflowClient for signaling
-    [ ] Add @KafkaListener for flight-booked-reply topic
-    [ ] Deserialize FlightBookedReply messages
-    [ ] Use correlationId (workflow ID) to signal the workflow
-    [ ] Run tests with embedded Kafka
+[x] Create Kafka reply listener that signals workflows:
+    [x] Write test for KafkaReplyListener
+    [x] Create com.travelbooking.trip.temporal.messaging.KafkaReplyListener
+    [x] Inject WorkflowClient for signaling
+    [x] Add @KafkaListener for flight-booked-reply topic
+    [x] Deserialize FlightBookedReply messages
+    [x] Use correlationId (workflow ID) to signal the workflow
+    [x] Run tests with embedded Kafka
 
-[ ] Update workflow to wait for signals:
-    [ ] Write test for workflow signal handling
-    [ ] Update TripBookingWorkflowImpl to:
-        [ ] Add signal handler methods
-        [ ] Store received replies in workflow state
-        [ ] Call bookFlight activity (fire and forget)
-        [ ] Use Workflow.await() to wait for flight signal
-        [ ] Return booking confirmation after signal received
-    [ ] Run workflow test with signals
+[x] Update workflow to wait for signals:
+    [x] Write test for workflow signal handling
+    [x] Update TripBookingWorkflowImpl to:
+        [x] Add signal handler methods
+        [x] Store received replies in workflow state
+        [x] Call bookFlight activity (fire and forget)
+        [x] Use Workflow.await() to wait for flight signal
+        [x] Return booking confirmation after signal received
+    [x] Run workflow test with signals
 
 [ ] End-to-end test with mock flight service:
     [ ] Write integration test that simulates flight service

@@ -1,6 +1,9 @@
 package com.travelbooking.trip.temporal.workflow;
 
 import com.travelbooking.trip.temporal.activities.BookingActivities;
+import com.travelbooking.trip.temporal.domain.CarRentedReply;
+import com.travelbooking.trip.temporal.domain.FlightBookedReply;
+import com.travelbooking.trip.temporal.domain.HotelReservedReply;
 import com.travelbooking.trip.temporal.domain.TripRequest;
 import io.temporal.activity.ActivityOptions;
 import io.temporal.workflow.Workflow;
@@ -24,6 +27,12 @@ public class TripBookingWorkflowImpl implements TripBookingWorkflow {
                 .build())
             .build()
     );
+    
+    // State to store received replies
+    private FlightBookedReply flightReply;
+    private HotelReservedReply hotelReply;
+    private CarRentedReply carReply;
+    private boolean needsCar = false;
 
     @Override
     public String bookTrip(TripRequest request) {
@@ -31,8 +40,10 @@ public class TripBookingWorkflowImpl implements TripBookingWorkflow {
         
         String workflowId = Workflow.getInfo().getWorkflowId();
         UUID correlationId = UUID.fromString(workflowId);
+        needsCar = request.includesCar();
         
-        logger.info("Booking flight for traveler {}", request.getTravelerId());
+        // Send all booking commands (fire and forget)
+        logger.info("Sending flight booking command for traveler {}", request.getTravelerId());
         activities.bookFlight(
             correlationId,
             request.getTravelerId(),
@@ -41,9 +52,8 @@ public class TripBookingWorkflowImpl implements TripBookingWorkflow {
             request.getDepartureDate(),
             request.getReturnDate()
         );
-        logger.info("Flight booking command sent");
         
-        logger.info("Reserving hotel for traveler {}", request.getTravelerId());
+        logger.info("Sending hotel reservation command for traveler {}", request.getTravelerId());
         activities.reserveHotel(
             correlationId,
             request.getTravelerId(),
@@ -51,10 +61,9 @@ public class TripBookingWorkflowImpl implements TripBookingWorkflow {
             request.getDepartureDate(),
             request.getReturnDate()
         );
-        logger.info("Hotel reservation command sent");
         
-        if (request.includesCar()) {
-            logger.info("Renting car for traveler {}", request.getTravelerId());
+        if (needsCar) {
+            logger.info("Sending car rental command for traveler {}", request.getTravelerId());
             activities.rentCar(
                 correlationId,
                 request.getTravelerId(),
@@ -62,12 +71,49 @@ public class TripBookingWorkflowImpl implements TripBookingWorkflow {
                 request.getDepartureDate(),
                 request.getReturnDate()
             );
-            logger.info("Car rental command sent");
+        }
+        
+        // Wait for all replies via signals
+        logger.info("Waiting for flight booking confirmation...");
+        Workflow.await(() -> flightReply != null);
+        logger.info("Flight booked with confirmation: {}", flightReply.confirmationNumber());
+        
+        logger.info("Waiting for hotel reservation confirmation...");
+        Workflow.await(() -> hotelReply != null);
+        logger.info("Hotel reserved with confirmation: {}", hotelReply.confirmationNumber());
+        
+        String result = String.format(
+            "Trip booked successfully! Flight: %s, Hotel: %s",
+            flightReply.confirmationNumber(),
+            hotelReply.confirmationNumber()
+        );
+        
+        if (needsCar) {
+            logger.info("Waiting for car rental confirmation...");
+            Workflow.await(() -> carReply != null);
+            logger.info("Car rented with confirmation: {}", carReply.confirmationNumber());
+            result += String.format(", Car: %s", carReply.confirmationNumber());
         }
         
         logger.info("Trip booking completed for workflow ID: {}", workflowId);
-        
-        // Temporarily return a placeholder until we implement signal handling
-        return "Trip booking in progress - workflow ID: " + workflowId;
+        return result;
+    }
+    
+    @Override
+    public void flightBooked(FlightBookedReply reply) {
+        logger.info("Received flight booking confirmation: {}", reply.confirmationNumber());
+        this.flightReply = reply;
+    }
+    
+    @Override
+    public void hotelReserved(HotelReservedReply reply) {
+        logger.info("Received hotel reservation confirmation: {}", reply.confirmationNumber());
+        this.hotelReply = reply;
+    }
+    
+    @Override
+    public void carRented(CarRentedReply reply) {
+        logger.info("Received car rental confirmation: {}", reply.confirmationNumber());
+        this.carReply = reply;
     }
 }
