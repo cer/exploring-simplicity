@@ -1,0 +1,19 @@
+server:
+  port: 0
+
+spring:
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers:localhost:9092}
+    consumer:
+      auto-offset-reset: earliest
+      group-id: test-trip-booking-temporal-group
+
+temporal:
+  service-address: localhost:7233
+  namespace: default
+  task-queue: test-trip-booking-queue
+
+logging:
+  level:
+    com.travelbooking: DEBUG
+    io.temporal: INFO

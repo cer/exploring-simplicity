@@ -1,0 +1,1 @@
+Create a trip-booking-service-temporal that works the same as trip-booking-service except that it uses temporal workflow for the orchestration
