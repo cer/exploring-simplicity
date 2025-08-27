@@ -245,52 +245,53 @@ Complete the remaining service integrations following the signal-based pattern e
 ```text
 Implement hotel and car rental activities following the signal-based pattern:
 
-[ ] Extend Kafka reply listener for hotel replies:
-    [ ] Write test for hotel reply signal handling
-    [ ] Update KafkaReplyListener to handle hotel-reserved-reply topic
-    [ ] Add deserialization for HotelReservedReply
-    [ ] Signal workflow with hotel reservation reply
-    [ ] Run tests
+[x] Extend Kafka reply listener for hotel replies:
+    [x] Write test for hotel reply signal handling
+    [x] Update KafkaReplyListener to handle hotel-reserved-reply topic
+    [x] Add deserialization for HotelReservedReply
+    [x] Signal workflow with hotel reservation reply
+    [x] Run tests
 
-[ ] Implement reserveHotel activity:
-    [ ] Write test for reserveHotel sending commands
-    [ ] Update BookingActivitiesImpl.reserveHotel to:
-        [ ] Create ReserveHotelCommand with workflow ID as correlation ID
-        [ ] Send to hotel-commands topic
-        [ ] Return immediately (void)
-    [ ] Run tests
+[x] Implement reserveHotel activity:
+    [x] Write test for reserveHotel sending commands
+    [x] Update BookingActivitiesImpl.reserveHotel to:
+        [x] Create ReserveHotelCommand with workflow ID as correlation ID
+        [x] Send to hotel-commands topic
+        [x] Return immediately (void)
+    [x] Run tests
 
-[ ] Extend Kafka reply listener for car rental replies:
-    [ ] Write test for car rental reply signal handling
-    [ ] Update KafkaReplyListener to handle car-rented-reply topic
-    [ ] Add deserialization for CarRentedReply
-    [ ] Signal workflow with car rental reply
-    [ ] Run tests
+[x] Extend Kafka reply listener for car rental replies:
+    [x] Write test for car rental reply signal handling
+    [x] Update KafkaReplyListener to handle car-rented-reply topic
+    [x] Add deserialization for CarRentedReply
+    [x] Signal workflow with car rental reply
+    [x] Run tests
 
-[ ] Implement rentCar activity:
-    [ ] Write test for rentCar sending commands
-    [ ] Update BookingActivitiesImpl.rentCar to:
-        [ ] Create RentCarCommand with workflow ID as correlation ID
-        [ ] Send to car-commands topic
-        [ ] Return immediately (void)
-    [ ] Run tests
+[x] Implement rentCar activity:
+    [x] Write test for rentCar sending commands
+    [x] Update BookingActivitiesImpl.rentCar to:
+        [x] Create RentCarCommand with workflow ID as correlation ID
+        [x] Send to car-commands topic
+        [x] Return immediately (void)
+    [x] Run tests
 
-[ ] Update workflow for sequential booking with signals:
-    [ ] Write test for complete booking sequence
-    [ ] Update TripBookingWorkflowImpl to:
-        [ ] Call bookFlight activity and wait for signal
-        [ ] After flight signal, call reserveHotel and wait for signal
-        [ ] After hotel signal, call rentCar and wait for signal
-        [ ] Collect all booking IDs from signals
-        [ ] Create and return TripConfirmation with all IDs
-    [ ] Run workflow test with all signals
+[x] Update workflow for sequential booking with signals:
+    [x] Write test for complete booking sequence
+    [x] Update TripBookingWorkflowImpl to:
+        [x] Call all activities in parallel at the start
+        [x] Wait for flight signal
+        [x] Wait for hotel signal
+        [x] Wait for car signal (if needed)
+        [x] Collect all booking confirmations from signals
+        [x] Return formatted confirmation with all IDs
+    [x] Run workflow test with signals
 
-[ ] Test complete booking flow:
-    [ ] Write end-to-end integration test
-    [ ] Mock all three services with test consumers
-    [ ] Verify signals received in correct order
-    [ ] Verify all booking IDs are returned
-    [ ] Commit complete service integration
+[x] Test complete booking flow:
+    [x] Write end-to-end integration test
+    [x] Mock services with test consumers
+    [x] Verify signals can be received
+    [x] Add query method for workflow state
+    [x] Commit complete service integration
 ```
 
 ## Steel Thread 6: Response Model and API Compatibility

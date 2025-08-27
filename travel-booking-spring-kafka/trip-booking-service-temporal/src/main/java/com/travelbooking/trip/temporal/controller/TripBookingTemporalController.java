@@ -52,6 +52,6 @@ public class TripBookingTemporalController {
         
         logger.info("Workflow started with ID: {}", correlationId);
         
-        return ResponseEntity.ok("Workflow started with ID: " + correlationId);
+        return ResponseEntity.ok(correlationId.toString());
     }
 }

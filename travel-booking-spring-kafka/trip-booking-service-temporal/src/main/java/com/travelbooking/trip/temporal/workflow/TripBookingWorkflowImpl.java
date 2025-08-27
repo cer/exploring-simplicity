@@ -116,4 +116,16 @@ public class TripBookingWorkflowImpl implements TripBookingWorkflow {
         logger.info("Received car rental confirmation: {}", reply.confirmationNumber());
         this.carReply = reply;
     }
+    
+    @Override
+    public WorkflowState getWorkflowState() {
+        return new WorkflowState(
+            flightReply != null,
+            hotelReply != null,
+            carReply != null,
+            flightReply != null ? flightReply.confirmationNumber() : null,
+            hotelReply != null ? hotelReply.confirmationNumber() : null,
+            carReply != null ? carReply.confirmationNumber() : null
+        );
+    }
 }

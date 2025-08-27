@@ -6,7 +6,7 @@ spring:
     bootstrap-servers: ${spring.embedded.kafka.brokers:localhost:9092}
     consumer:
       auto-offset-reset: earliest
-      group-id: test-trip-booking-temporal-group
+      group-id: trip-booking-temporal-group
 
 temporal:
   service-address: localhost:7233
