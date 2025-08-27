@@ -51,7 +51,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     }
 )
 @Import({TemporalTestConfig.class, TestConsumerConfiguration.class})
-public class FlightBookingIntegrationTest {
+public class TripBookingTemporalWorkflowIntegrationTest {
 
     @LocalServerPort
     private int port;
