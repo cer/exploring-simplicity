@@ -227,12 +227,12 @@ Implement Kafka-based flight booking with signal pattern:
         [x] Return booking confirmation after signal received
     [x] Run workflow test with signals
 
-[ ] End-to-end test with mock flight service:
-    [ ] Write integration test that simulates flight service
-    [ ] Create test consumer for flight-commands topic
-    [ ] Send mock FlightBookedReply to reply topic
-    [ ] Verify workflow receives signal and completes
-    [ ] Commit working flight booking integration
+[x] End-to-end test with mock flight service:
+    [x] Write integration test that simulates flight service
+    [x] Create test consumer for flight-commands topic
+    [x] Send mock FlightBookedReply to reply topic
+    [x] Verify workflow receives signal and completes
+    [x] Commit working flight booking integration
 ```
 
 ## Steel Thread 5: Hotel and Car Rental Integration

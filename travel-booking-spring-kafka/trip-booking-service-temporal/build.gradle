@@ -20,6 +20,7 @@ dependencies {
     integrationTestImplementation 'io.temporal:temporal-testing:1.20.0'
     integrationTestImplementation 'org.assertj:assertj-core'
     integrationTestImplementation project(':common')
+    integrationTestImplementation project(':test-utils')
 }
 
 springBoot {

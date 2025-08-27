@@ -4,9 +4,9 @@ import com.travelbooking.trip.temporal.domain.TripRequest;
 import com.travelbooking.trip.temporal.workflow.TripBookingWorkflow;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -28,8 +28,12 @@ class TripBookingTemporalControllerTest {
     @Mock
     private WorkflowClient workflowClient;
 
-    @InjectMocks
     private TripBookingTemporalController controller;
+    
+    @BeforeEach
+    void setUp() {
+        controller = new TripBookingTemporalController(workflowClient, "test-task-queue");
+    }
 
     @Test
     void shouldStartWorkflowAndReturnWorkflowId() {
@@ -48,7 +52,6 @@ class TripBookingTemporalControllerTest {
 
         TripBookingWorkflow workflowMock = mock(TripBookingWorkflow.class);
         when(workflowClient.newWorkflowStub(any(Class.class), any(WorkflowOptions.class))).thenReturn(workflowMock);
-        when(workflowMock.bookTrip(any())).thenReturn("workflow-result");
 
         ResponseEntity<String> response = controller.bookTrip(request, correlationId);
 

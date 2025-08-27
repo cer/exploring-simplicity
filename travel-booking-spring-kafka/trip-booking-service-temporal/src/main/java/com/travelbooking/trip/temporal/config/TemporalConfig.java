@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -43,6 +44,7 @@ public class TemporalConfig {
     private Worker worker;
 
     @Bean
+    @ConditionalOnMissingBean
     public WorkflowServiceStubs workflowServiceStubs() {
         WorkflowServiceStubsOptions options = WorkflowServiceStubsOptions.newBuilder()
                 .setTarget(temporalServiceAddress)
@@ -51,6 +53,7 @@ public class TemporalConfig {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public WorkflowClient workflowClient(WorkflowServiceStubs serviceStubs) {
         WorkflowClientOptions options = WorkflowClientOptions.newBuilder()
                 .setNamespace(temporalNamespace)
@@ -59,6 +62,7 @@ public class TemporalConfig {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public WorkerFactory workerFactory(WorkflowClient workflowClient) {
         workerFactory = WorkerFactory.newInstance(workflowClient);
         
