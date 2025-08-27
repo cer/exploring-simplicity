@@ -1,6 +1,8 @@
 package com.travelbooking.trip.temporal.config;
 
+import com.travelbooking.trip.temporal.activities.BookingActivities;
 import com.travelbooking.trip.temporal.workflow.TripBookingWorkflowImpl;
+import io.temporal.activity.ActivityOptions;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowClientOptions;
 import io.temporal.serviceclient.WorkflowServiceStubs;
@@ -10,9 +12,12 @@ import io.temporal.worker.WorkerFactory;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.Duration;
 
 @Configuration
 public class TemporalConfig {
@@ -30,6 +35,9 @@ public class TemporalConfig {
     
     @Value("${temporal.worker.enabled:true}")
     private boolean workerEnabled;
+
+    @Autowired(required = false)
+    private BookingActivities bookingActivities;
 
     private WorkerFactory workerFactory;
     private Worker worker;
@@ -59,6 +67,12 @@ public class TemporalConfig {
             
             worker = workerFactory.newWorker(taskQueue);
             worker.registerWorkflowImplementationTypes(TripBookingWorkflowImpl.class);
+            
+            // Register activities if available
+            if (bookingActivities != null) {
+                worker.registerActivitiesImplementations(bookingActivities);
+                logger.info("Registered booking activities with worker");
+            }
             
             workerFactory.start();
             

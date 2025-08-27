@@ -133,157 +133,162 @@ Create the activities structure for interacting with external services via Kafka
 ```text
 Create the activities infrastructure for service interactions:
 
-[ ] Create BookingActivities interface:
-    [ ] Write test for activity interface structure
-    [ ] Create com.travelbooking.trip.temporal.activities.BookingActivities interface
-    [ ] Add @ActivityInterface annotation
-    [ ] Define bookFlight method with proper parameters (correlationId, travelerId, from, to, dates)
-    [ ] Define reserveHotel method with proper parameters
-    [ ] Define rentCar method with proper parameters
-    [ ] Each method should return appropriate Reply type from common module
+[x] Create BookingActivities interface:
+    [x] Write test for activity interface structure
+    [x] Create com.travelbooking.trip.temporal.activities.BookingActivities interface
+    [x] Add @ActivityInterface annotation
+    [x] Define bookFlight method with proper parameters (correlationId, travelerId, from, to, dates)
+    [x] Define reserveHotel method with proper parameters
+    [x] Define rentCar method with proper parameters
+    [x] Each method should return appropriate Reply type from common module
     [x] Run tests
 
-[ ] Create BookingActivitiesImpl implementation:
-    [ ] Write unit test for BookingActivitiesImpl with mocked Kafka
-    [ ] Create BookingActivitiesImpl class implementing BookingActivities
-    [ ] Add @Component annotation for Spring DI
-    [ ] Inject KafkaTemplate for sending messages
-    [ ] Implement bookFlight to return a mock FlightBookedReply for now
-    [ ] Implement reserveHotel to return a mock HotelReservedReply for now
-    [ ] Implement rentCar to return a mock CarRentedReply for now
-    [ ] Run unit tests
+[x] Create BookingActivitiesImpl implementation:
+    [x] Write unit test for BookingActivitiesImpl with mocked Kafka
+    [x] Create BookingActivitiesImpl class implementing BookingActivities
+    [x] Add @Component annotation for Spring DI
+    [x] Inject KafkaTemplate for sending messages
+    [x] Implement bookFlight to return a mock FlightBookedReply for now
+    [x] Implement reserveHotel to return a mock HotelReservedReply for now
+    [x] Implement rentCar to return a mock CarRentedReply for now
+    [x] Run unit tests
 
-[ ] Configure activities with worker:
-    [ ] Write integration test for activity registration
-    [ ] Update TemporalConfig to inject BookingActivities bean
-    [ ] Register activities with the worker
-    [ ] Configure activity options (timeout: 60 seconds, retries: 3)
-    [ ] Run integration test to verify activities are registered
+[x] Configure activities with worker:
+    [x] Write integration test for activity registration
+    [x] Update TemporalConfig to inject BookingActivities bean
+    [x] Register activities with the worker
+    [x] Configure activity options (timeout: 60 seconds, retries: 3)
+    [x] Run integration test to verify activities are registered
 
-[ ] Update workflow to use activities:
-    [ ] Write test for workflow with activity stubs
-    [ ] Update TripBookingWorkflowImpl to create activity stubs
-    [ ] Configure activity stub with proper options
-    [ ] Call bookFlight activity from workflow
-    [ ] Return flight booking ID in response
-    [ ] Run workflow test with mocked activities
+[x] Update workflow to use activities:
+    [x] Write test for workflow with activity stubs
+    [x] Update TripBookingWorkflowImpl to create activity stubs
+    [x] Configure activity stub with proper options
+    [x] Call bookFlight activity from workflow
+    [x] Return flight booking ID in response
+    [x] Run workflow test with mocked activities
 
-[ ] Test activity execution through workflow:
-    [ ] Write integration test that executes workflow with activities
-    [ ] Verify workflow calls activity methods
-    [ ] Verify activity timeout configuration works
-    [ ] Commit working activity infrastructure
+[x] Test activity execution through workflow:
+    [x] Write integration test that executes workflow with activities
+    [x] Verify workflow calls activity methods
+    [x] Verify activity timeout configuration works
+    [x] Commit working activity infrastructure
 ```
 
 ## Steel Thread 4: Kafka Integration for Flight Booking
 
 ### Goal
-Implement complete Kafka messaging for flight booking, establishing the pattern for async request-reply communication.
+Implement complete Kafka messaging for flight booking using Temporal signals for async request-reply communication.
 
 ### Implementation Steps
 
 ```text
-Implement Kafka-based flight booking activity:
+Implement Kafka-based flight booking with signal pattern:
 
-[ ] Create Kafka reply listener infrastructure:
-    [ ] Write test for reply correlation mechanism
-    [ ] Create com.travelbooking.trip.temporal.messaging.ReplyCorrelator class
-    [ ] Implement correlation ID to CompletableFuture mapping
-    [ ] Add methods to register and complete futures
-    [ ] Add timeout handling for uncompleted futures
-    [x] Run tests
+[ ] Update BookingActivities interface:
+    [ ] Write test for void-returning activity methods
+    [ ] Update bookFlight method to return void
+    [ ] Update reserveHotel method to return void
+    [ ] Update rentCar method to return void
+    [ ] Run tests
 
-[ ] Create Kafka reply listener:
+[ ] Update TripBookingWorkflow interface with signals:
+    [ ] Write test for workflow signal methods
+    [ ] Add @SignalMethod for flightBooked(FlightBookedReply)
+    [ ] Add @SignalMethod for hotelReserved(HotelReservedReply)
+    [ ] Add @SignalMethod for carRented(CarRentedReply)
+    [ ] Run tests
+
+[ ] Implement fire-and-forget activities:
+    [ ] Write test for BookingActivitiesImpl sending commands
+    [ ] Update bookFlight to:
+        [ ] Create BookFlightCommand with workflow ID as correlation ID
+        [ ] Send command to flight-commands topic via KafkaTemplate
+        [ ] Log the command sent
+        [ ] Return immediately (void)
+    [ ] Run tests with embedded Kafka
+
+[ ] Create Kafka reply listener that signals workflows:
     [ ] Write test for KafkaReplyListener
     [ ] Create com.travelbooking.trip.temporal.messaging.KafkaReplyListener
+    [ ] Inject WorkflowClient for signaling
     [ ] Add @KafkaListener for flight-booked-reply topic
     [ ] Deserialize FlightBookedReply messages
-    [ ] Complete corresponding CompletableFuture in ReplyCorrelator
-    [x] Run tests with embedded Kafka
+    [ ] Use correlationId (workflow ID) to signal the workflow
+    [ ] Run tests with embedded Kafka
 
-[ ] Implement bookFlight activity with real Kafka:
-    [ ] Write integration test for bookFlight with TestContainers Kafka
-    [ ] Update BookingActivitiesImpl.bookFlight to:
-        [ ] Create BookFlightCommand with correlation ID
-        [ ] Register CompletableFuture with ReplyCorrelator
-        [ ] Send command to flight-commands topic via KafkaTemplate
-        [ ] Wait for CompletableFuture completion (with timeout)
-        [ ] Return FlightBookedReply or throw exception on timeout
-    [ ] Run integration test with real Kafka
-
-[ ] Update workflow to handle flight booking:
-    [ ] Write test for complete flight booking in workflow
+[ ] Update workflow to wait for signals:
+    [ ] Write test for workflow signal handling
     [ ] Update TripBookingWorkflowImpl to:
-        [ ] Extract flight details from TripRequest
-        [ ] Call bookFlight activity with proper parameters
-        [ ] Handle activity exceptions (log and rethrow for now)
-        [ ] Store flight booking ID in workflow state
-    [ ] Run workflow test
+        [ ] Add signal handler methods
+        [ ] Store received replies in workflow state
+        [ ] Call bookFlight activity (fire and forget)
+        [ ] Use Workflow.await() to wait for flight signal
+        [ ] Return booking confirmation after signal received
+    [ ] Run workflow test with signals
 
 [ ] End-to-end test with mock flight service:
     [ ] Write integration test that simulates flight service
     [ ] Create test consumer for flight-commands topic
     [ ] Send mock FlightBookedReply to reply topic
-    [ ] Verify workflow completes with flight booking ID
+    [ ] Verify workflow receives signal and completes
     [ ] Commit working flight booking integration
 ```
 
 ## Steel Thread 5: Hotel and Car Rental Integration
 
 ### Goal
-Complete the remaining service integrations following the established pattern.
+Complete the remaining service integrations following the signal-based pattern established for flight booking.
 
 ### Implementation Steps
 
 ```text
-Implement hotel and car rental activities following the flight booking pattern:
+Implement hotel and car rental activities following the signal-based pattern:
 
 [ ] Extend Kafka reply listener for hotel replies:
-    [ ] Write test for hotel reply handling
+    [ ] Write test for hotel reply signal handling
     [ ] Update KafkaReplyListener to handle hotel-reserved-reply topic
     [ ] Add deserialization for HotelReservedReply
-    [ ] Complete futures in ReplyCorrelator for hotel replies
-    [x] Run tests
+    [ ] Signal workflow with hotel reservation reply
+    [ ] Run tests
 
 [ ] Implement reserveHotel activity:
-    [ ] Write integration test for reserveHotel
+    [ ] Write test for reserveHotel sending commands
     [ ] Update BookingActivitiesImpl.reserveHotel to:
-        [ ] Create ReserveHotelCommand with correlation ID
-        [ ] Register future and send to hotel-commands topic
-        [ ] Wait for reply with timeout
-        [ ] Return HotelReservedReply
-    [ ] Run integration test
+        [ ] Create ReserveHotelCommand with workflow ID as correlation ID
+        [ ] Send to hotel-commands topic
+        [ ] Return immediately (void)
+    [ ] Run tests
 
 [ ] Extend Kafka reply listener for car rental replies:
-    [ ] Write test for car rental reply handling
+    [ ] Write test for car rental reply signal handling
     [ ] Update KafkaReplyListener to handle car-rented-reply topic
     [ ] Add deserialization for CarRentedReply
-    [ ] Complete futures for car rental replies
-    [x] Run tests
+    [ ] Signal workflow with car rental reply
+    [ ] Run tests
 
 [ ] Implement rentCar activity:
-    [ ] Write integration test for rentCar
+    [ ] Write test for rentCar sending commands
     [ ] Update BookingActivitiesImpl.rentCar to:
-        [ ] Create RentCarCommand with correlation ID
-        [ ] Register future and send to car-commands topic
-        [ ] Wait for reply with timeout
-        [ ] Return CarRentedReply
-    [ ] Run integration test
+        [ ] Create RentCarCommand with workflow ID as correlation ID
+        [ ] Send to car-commands topic
+        [ ] Return immediately (void)
+    [ ] Run tests
 
-[ ] Update workflow for sequential booking:
+[ ] Update workflow for sequential booking with signals:
     [ ] Write test for complete booking sequence
     [ ] Update TripBookingWorkflowImpl to:
-        [ ] Call bookFlight activity first
-        [ ] If successful, call reserveHotel activity
-        [ ] If successful, call rentCar activity
-        [ ] Collect all booking IDs
+        [ ] Call bookFlight activity and wait for signal
+        [ ] After flight signal, call reserveHotel and wait for signal
+        [ ] After hotel signal, call rentCar and wait for signal
+        [ ] Collect all booking IDs from signals
         [ ] Create and return TripConfirmation with all IDs
-    [ ] Run workflow test with all activities
+    [ ] Run workflow test with all signals
 
 [ ] Test complete booking flow:
     [ ] Write end-to-end integration test
     [ ] Mock all three services with test consumers
-    [ ] Verify sequential execution order
+    [ ] Verify signals received in correct order
     [ ] Verify all booking IDs are returned
     [ ] Commit complete service integration
 ```

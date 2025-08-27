@@ -1,5 +1,9 @@
 package com.travelbooking.trip.temporal.workflow;
 
+import com.travelbooking.trip.temporal.activities.BookingActivities;
+import com.travelbooking.trip.temporal.domain.CarRentedReply;
+import com.travelbooking.trip.temporal.domain.FlightBookedReply;
+import com.travelbooking.trip.temporal.domain.HotelReservedReply;
 import com.travelbooking.trip.temporal.domain.TripRequest;
 import io.temporal.testing.TestWorkflowEnvironment;
 import io.temporal.testing.TestWorkflowExtension;
@@ -11,6 +15,9 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class TripBookingWorkflowImplTest {
 
@@ -23,6 +30,19 @@ class TripBookingWorkflowImplTest {
 
     @Test
     void shouldExecuteWorkflowAndReturnPlaceholderResponse(TestWorkflowEnvironment testEnv, Worker worker, TripBookingWorkflow workflow) {
+        BookingActivities activities = mock(BookingActivities.class);
+        
+        when(activities.bookFlight(any(), any(), any(), any(), any(), any()))
+                .thenReturn(new FlightBookedReply(UUID.randomUUID(), UUID.randomUUID(), "FL123", new java.math.BigDecimal("500.00")));
+        
+        when(activities.reserveHotel(any(), any(), any(), any(), any()))
+                .thenReturn(new HotelReservedReply(UUID.randomUUID(), UUID.randomUUID(), "HR456", new java.math.BigDecimal("300.00")));
+        
+        when(activities.rentCar(any(), any(), any(), any(), any()))
+                .thenReturn(new CarRentedReply(UUID.randomUUID(), UUID.randomUUID(), "CR789", new java.math.BigDecimal("200.00")));
+        
+        worker.registerActivitiesImplementations(activities);
+        
         TripRequest request = new TripRequest(
                 UUID.randomUUID(),
                 "New York",
@@ -40,6 +60,9 @@ class TripBookingWorkflowImplTest {
         String result = workflow.bookTrip(request);
 
         assertThat(result).isNotNull();
-        assertThat(result).contains("Trip booking initiated");
+        assertThat(result).contains("Trip booked successfully");
+        assertThat(result).contains("Flight: FL123");
+        assertThat(result).contains("Hotel: HR456");
+        assertThat(result).contains("Car: CR789");
     }
 }
