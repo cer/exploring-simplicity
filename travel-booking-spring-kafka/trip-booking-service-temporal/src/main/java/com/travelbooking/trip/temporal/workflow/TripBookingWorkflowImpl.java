@@ -1,9 +1,6 @@
 package com.travelbooking.trip.temporal.workflow;
 
 import com.travelbooking.trip.temporal.activities.BookingActivities;
-import com.travelbooking.trip.temporal.domain.CarRentedReply;
-import com.travelbooking.trip.temporal.domain.FlightBookedReply;
-import com.travelbooking.trip.temporal.domain.HotelReservedReply;
 import com.travelbooking.trip.temporal.domain.TripRequest;
 import io.temporal.activity.ActivityOptions;
 import io.temporal.workflow.Workflow;
@@ -36,7 +33,7 @@ public class TripBookingWorkflowImpl implements TripBookingWorkflow {
         UUID correlationId = UUID.fromString(workflowId);
         
         logger.info("Booking flight for traveler {}", request.getTravelerId());
-        FlightBookedReply flightReply = activities.bookFlight(
+        activities.bookFlight(
             correlationId,
             request.getTravelerId(),
             request.getFromLocation(),
@@ -44,39 +41,33 @@ public class TripBookingWorkflowImpl implements TripBookingWorkflow {
             request.getDepartureDate(),
             request.getReturnDate()
         );
-        logger.info("Flight booked with confirmation: {}", flightReply.confirmationNumber());
+        logger.info("Flight booking command sent");
         
         logger.info("Reserving hotel for traveler {}", request.getTravelerId());
-        HotelReservedReply hotelReply = activities.reserveHotel(
+        activities.reserveHotel(
             correlationId,
             request.getTravelerId(),
             request.getToLocation(),
             request.getDepartureDate(),
             request.getReturnDate()
         );
-        logger.info("Hotel reserved with confirmation: {}", hotelReply.confirmationNumber());
-        
-        String result = String.format(
-            "Trip booked successfully! Flight: %s, Hotel: %s",
-            flightReply.confirmationNumber(),
-            hotelReply.confirmationNumber()
-        );
+        logger.info("Hotel reservation command sent");
         
         if (request.includesCar()) {
             logger.info("Renting car for traveler {}", request.getTravelerId());
-            CarRentedReply carReply = activities.rentCar(
+            activities.rentCar(
                 correlationId,
                 request.getTravelerId(),
                 request.getToLocation(),
                 request.getDepartureDate(),
                 request.getReturnDate()
             );
-            logger.info("Car rented with confirmation: {}", carReply.confirmationNumber());
-            result += String.format(", Car: %s", carReply.confirmationNumber());
+            logger.info("Car rental command sent");
         }
         
         logger.info("Trip booking completed for workflow ID: {}", workflowId);
         
-        return result;
+        // Temporarily return a placeholder until we implement signal handling
+        return "Trip booking in progress - workflow ID: " + workflowId;
     }
 }

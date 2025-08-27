@@ -21,7 +21,7 @@ class BookingActivitiesTest {
         Method bookFlightMethod = BookingActivities.class.getMethod("bookFlight", 
             UUID.class, UUID.class, String.class, String.class, LocalDate.class, LocalDate.class);
         assertThat(bookFlightMethod).isNotNull();
-        assertThat(bookFlightMethod.getReturnType().getSimpleName()).isEqualTo("FlightBookedReply");
+        assertThat(bookFlightMethod.getReturnType()).isEqualTo(void.class);
     }
 
     @Test
@@ -29,7 +29,7 @@ class BookingActivitiesTest {
         Method reserveHotelMethod = BookingActivities.class.getMethod("reserveHotel",
             UUID.class, UUID.class, String.class, LocalDate.class, LocalDate.class);
         assertThat(reserveHotelMethod).isNotNull();
-        assertThat(reserveHotelMethod.getReturnType().getSimpleName()).isEqualTo("HotelReservedReply");
+        assertThat(reserveHotelMethod.getReturnType()).isEqualTo(void.class);
     }
 
     @Test
@@ -37,6 +37,6 @@ class BookingActivitiesTest {
         Method rentCarMethod = BookingActivities.class.getMethod("rentCar",
             UUID.class, UUID.class, String.class, LocalDate.class, LocalDate.class);
         assertThat(rentCarMethod).isNotNull();
-        assertThat(rentCarMethod.getReturnType().getSimpleName()).isEqualTo("CarRentedReply");
+        assertThat(rentCarMethod.getReturnType()).isEqualTo(void.class);
     }
 }

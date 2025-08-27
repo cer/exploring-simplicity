@@ -1,14 +1,13 @@
 package com.travelbooking.trip.temporal.activities;
 
-import com.travelbooking.trip.temporal.domain.CarRentedReply;
-import com.travelbooking.trip.temporal.domain.FlightBookedReply;
-import com.travelbooking.trip.temporal.domain.HotelReservedReply;
+import com.travelbooking.trip.temporal.messaging.BookFlightCommand;
+import com.travelbooking.trip.temporal.messaging.RentCarCommand;
+import com.travelbooking.trip.temporal.messaging.ReserveHotelCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -24,47 +23,44 @@ public class BookingActivitiesImpl implements BookingActivities {
     }
 
     @Override
-    public FlightBookedReply bookFlight(UUID correlationId, UUID travelerId, 
-                                       String from, String to, 
-                                       LocalDate departureDate, LocalDate returnDate) {
-        logger.info("Booking flight for traveler {} from {} to {}", travelerId, from, to);
+    public void bookFlight(UUID correlationId, UUID travelerId, 
+                          String from, String to, 
+                          LocalDate departureDate, LocalDate returnDate) {
+        logger.info("Sending flight booking command for traveler {} from {} to {}", travelerId, from, to);
         
-        // For now, return a mock response
-        return new FlightBookedReply(
-            correlationId,
-            UUID.randomUUID(), // bookingId
-            "FL-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(),
-            BigDecimal.valueOf(499.99)
+        BookFlightCommand command = new BookFlightCommand(
+            correlationId, travelerId, from, to, departureDate, returnDate
         );
+        
+        kafkaTemplate.send("flight-commands", correlationId.toString(), command);
+        logger.info("Flight booking command sent with correlation ID: {}", correlationId);
     }
 
     @Override
-    public HotelReservedReply reserveHotel(UUID correlationId, UUID travelerId,
-                                          String city, LocalDate checkIn, 
-                                          LocalDate checkOut) {
-        logger.info("Reserving hotel for traveler {} in {}", travelerId, city);
+    public void reserveHotel(UUID correlationId, UUID travelerId,
+                            String city, LocalDate checkIn, 
+                            LocalDate checkOut) {
+        logger.info("Sending hotel reservation command for traveler {} in {}", travelerId, city);
         
-        // For now, return a mock response
-        return new HotelReservedReply(
-            correlationId,
-            UUID.randomUUID(), // reservationId
-            "HTL-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(),
-            BigDecimal.valueOf(299.99)
+        ReserveHotelCommand command = new ReserveHotelCommand(
+            correlationId, travelerId, city, checkIn, checkOut
         );
+        
+        kafkaTemplate.send("hotel-commands", correlationId.toString(), command);
+        logger.info("Hotel reservation command sent with correlation ID: {}", correlationId);
     }
 
     @Override
-    public CarRentedReply rentCar(UUID correlationId, UUID travelerId,
-                                 String city, LocalDate pickUp, 
-                                 LocalDate dropOff) {
-        logger.info("Renting car for traveler {} in {}", travelerId, city);
+    public void rentCar(UUID correlationId, UUID travelerId,
+                       String city, LocalDate pickUp, 
+                       LocalDate dropOff) {
+        logger.info("Sending car rental command for traveler {} in {}", travelerId, city);
         
-        // For now, return a mock response
-        return new CarRentedReply(
-            correlationId,
-            UUID.randomUUID(), // rentalId
-            "CAR-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(),
-            BigDecimal.valueOf(199.99)
+        RentCarCommand command = new RentCarCommand(
+            correlationId, travelerId, city, pickUp, dropOff
         );
+        
+        kafkaTemplate.send("car-commands", correlationId.toString(), command);
+        logger.info("Car rental command sent with correlation ID: {}", correlationId);
     }
 }
