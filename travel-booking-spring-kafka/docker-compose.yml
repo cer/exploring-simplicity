@@ -141,7 +141,7 @@ services:
       retries: 5
 
   temporal:
-    image: temporalio/server:1.23.0
+    image: temporalio/auto-setup:1.23.0
     depends_on:
       temporal-postgresql:
         condition: service_healthy
@@ -151,15 +151,8 @@ services:
       POSTGRES_USER: temporal
       POSTGRES_PWD: temporal
       POSTGRES_SEEDS: temporal-postgresql
-      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/development-sql.yaml
     ports:
       - "7233:7233"
-    healthcheck:
-      test: ["CMD", "temporal", "workflow", "list"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
 
   temporal-admin-tools:
     image: temporalio/admin-tools:1.23.0
@@ -169,22 +162,12 @@ services:
     environment:
       TEMPORAL_ADDRESS: temporal:7233
       TEMPORAL_CLI_ADDRESS: temporal:7233
-    command: >
-      sh -c "
-      temporal-sql-tool create-database -database temporal &&
-      temporal-sql-tool setup-schema -v 0.0 &&
-      temporal-sql-tool update -schema-dir schema/postgresql/v96/temporal/versioned &&
-      temporal-sql-tool create-database -database temporal_visibility &&
-      temporal-sql-tool setup-schema -v 0.0 -database temporal_visibility &&
-      temporal-sql-tool update -schema-dir schema/postgresql/v96/visibility/versioned -database temporal_visibility
-      "
-    restart: "no"
+    command: sleep infinity
 
   temporal-ui:
     image: temporalio/ui:2.22.0
     depends_on:
-      temporal:
-        condition: service_healthy
+      - temporal
     environment:
       TEMPORAL_ADDRESS: temporal:7233
     ports:
