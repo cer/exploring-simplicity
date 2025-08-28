@@ -54,3 +54,15 @@ jobs:
         docker compose ps
   
         docker compose down
+    
+    - name: Get container logs
+      if: always()
+      working-directory: travel-booking-spring-kafka
+      run: ./print-container-logs.sh
+    
+    - name: Upload container logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: container-logs
+        path: travel-booking-spring-kafka/logs
