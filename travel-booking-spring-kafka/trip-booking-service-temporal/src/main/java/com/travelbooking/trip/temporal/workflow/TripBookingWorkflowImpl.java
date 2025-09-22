@@ -1,6 +1,7 @@
 package com.travelbooking.trip.temporal.workflow;
 
 import com.travelbooking.trip.temporal.activities.BookingActivities;
+import com.travelbooking.trip.temporal.activities.FlightBookingActivity;
 import com.travelbooking.trip.temporal.domain.CarRentedReply;
 import com.travelbooking.trip.temporal.domain.FlightBookedReply;
 import com.travelbooking.trip.temporal.domain.HotelReservedReply;
@@ -13,9 +14,21 @@ import java.time.Duration;
 import java.util.UUID;
 
 public class TripBookingWorkflowImpl implements TripBookingWorkflow {
-    
+
     private static final Logger logger = Workflow.getLogger(TripBookingWorkflowImpl.class);
-    
+
+    private final FlightBookingActivity flightBookingActivity = Workflow.newActivityStub(
+        FlightBookingActivity.class,
+        ActivityOptions.newBuilder()
+            .setStartToCloseTimeout(Duration.ofSeconds(60))
+            .setRetryOptions(io.temporal.common.RetryOptions.newBuilder()
+                .setMaximumAttempts(3)
+                .setInitialInterval(Duration.ofSeconds(1))
+                .setBackoffCoefficient(2.0)
+                .build())
+            .build()
+    );
+
     private final BookingActivities activities = Workflow.newActivityStub(
         BookingActivities.class,
         ActivityOptions.newBuilder()
@@ -44,7 +57,7 @@ public class TripBookingWorkflowImpl implements TripBookingWorkflow {
         
         // Send all booking commands (fire and forget)
         logger.info("Sending flight booking command for traveler {}", request.getTravelerId());
-        activities.bookFlight(
+        flightBookingActivity.bookFlight(
             correlationId,
             request.getTravelerId(),
             request.getFromLocation(),

@@ -7,16 +7,12 @@ import java.util.UUID;
 
 @ActivityInterface
 public interface BookingActivities {
-    
-    void bookFlight(UUID correlationId, UUID travelerId, 
-                    String from, String to, 
-                    LocalDate departureDate, LocalDate returnDate);
-    
+
     void reserveHotel(UUID correlationId, UUID travelerId,
-                      String city, LocalDate checkIn, 
+                      String city, LocalDate checkIn,
                       LocalDate checkOut);
-    
+
     void rentCar(UUID correlationId, UUID travelerId,
-                 String city, LocalDate pickUp, 
+                 String city, LocalDate pickUp,
                  LocalDate dropOff);
 }

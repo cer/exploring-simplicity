@@ -1,6 +1,5 @@
 package com.travelbooking.trip.temporal.activities;
 
-import com.travelbooking.trip.temporal.messaging.BookFlightCommand;
 import com.travelbooking.trip.temporal.messaging.RentCarCommand;
 import com.travelbooking.trip.temporal.messaging.ReserveHotelCommand;
 import org.slf4j.Logger;
@@ -15,25 +14,11 @@ import java.util.UUID;
 public class BookingActivitiesImpl implements BookingActivities {
 
     private static final Logger logger = LoggerFactory.getLogger(BookingActivitiesImpl.class);
-    
+
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public BookingActivitiesImpl(KafkaTemplate<String, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
-    }
-
-    @Override
-    public void bookFlight(UUID correlationId, UUID travelerId, 
-                          String from, String to, 
-                          LocalDate departureDate, LocalDate returnDate) {
-        logger.info("Sending flight booking command for traveler {} from {} to {}", travelerId, from, to);
-        
-        BookFlightCommand command = new BookFlightCommand(
-            correlationId, travelerId, from, to, departureDate, returnDate
-        );
-        
-        kafkaTemplate.send("flight-commands", correlationId.toString(), command);
-        logger.info("Flight booking command sent with correlation ID: {}", correlationId);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.travelbooking.trip.temporal.messaging;
 
-import com.travelbooking.trip.temporal.domain.FlightBookedReply;
 import com.travelbooking.trip.temporal.domain.HotelReservedReply;
 import com.travelbooking.trip.temporal.domain.CarRentedReply;
 import com.travelbooking.trip.temporal.workflow.TripBookingWorkflow;
@@ -32,24 +31,6 @@ class KafkaReplyListenerTest {
     @BeforeEach
     void setUp() {
         listener = new KafkaReplyListener(workflowClient);
-    }
-
-    @Test
-    void shouldSignalWorkflowWhenFlightBookedReplyReceived() {
-        UUID correlationId = UUID.randomUUID();
-        FlightBookedReply reply = new FlightBookedReply(
-            correlationId, 
-            UUID.randomUUID(),
-            "FL-123456",
-            BigDecimal.valueOf(500)
-        );
-
-        WorkflowStub workflowStub = mock(WorkflowStub.class);
-        when(workflowClient.newUntypedWorkflowStub(correlationId.toString())).thenReturn(workflowStub);
-
-        listener.handleFlightBookedReply(reply);
-
-        verify(workflowStub).signal("flightBooked", reply);
     }
 
     @Test

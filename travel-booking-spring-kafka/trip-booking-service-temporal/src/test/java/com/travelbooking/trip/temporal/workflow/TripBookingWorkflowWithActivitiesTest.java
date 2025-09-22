@@ -1,6 +1,7 @@
 package com.travelbooking.trip.temporal.workflow;
 
 import com.travelbooking.trip.temporal.activities.BookingActivities;
+import com.travelbooking.trip.temporal.activities.FlightBookingActivity;
 import com.travelbooking.trip.temporal.domain.*;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
@@ -27,6 +28,7 @@ class TripBookingWorkflowWithActivitiesTest {
     private TestWorkflowEnvironment testEnv;
     private Worker worker;
     private WorkflowClient client;
+    private FlightBookingActivity flightBookingActivity;
     private BookingActivities activities;
     
     @BeforeEach
@@ -34,11 +36,12 @@ class TripBookingWorkflowWithActivitiesTest {
         testEnv = TestWorkflowEnvironment.newInstance();
         worker = testEnv.newWorker("test-task-queue");
         worker.registerWorkflowImplementationTypes(TripBookingWorkflowImpl.class);
-        
+
         // Create and register mocked activities
+        flightBookingActivity = mock(FlightBookingActivity.class);
         activities = mock(BookingActivities.class);
-        worker.registerActivitiesImplementations(activities);
-        
+        worker.registerActivitiesImplementations(flightBookingActivity, activities);
+
         client = testEnv.getWorkflowClient();
         testEnv.start();
     }
@@ -75,7 +78,7 @@ class TripBookingWorkflowWithActivitiesTest {
         doAnswer(invocation -> {
             flightBookedLatch.countDown();
             return null;
-        }).when(activities).bookFlight(
+        }).when(flightBookingActivity).bookFlight(
             any(UUID.class),
             eq(travelerId),
             eq("Seattle"),
@@ -163,7 +166,7 @@ class TripBookingWorkflowWithActivitiesTest {
             .contains("CAR-003");
         
         // Verify all activities were invoked
-        verify(activities).bookFlight(
+        verify(flightBookingActivity).bookFlight(
             eq(workflowId),
             eq(travelerId),
             eq("Seattle"),
@@ -215,7 +218,7 @@ class TripBookingWorkflowWithActivitiesTest {
         doAnswer(invocation -> {
             flightBookedLatch.countDown();
             return null;
-        }).when(activities).bookFlight(
+        }).when(flightBookingActivity).bookFlight(
             any(UUID.class),
             eq(travelerId),
             eq("Miami"),

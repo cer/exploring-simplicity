@@ -33,10 +33,12 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 @SpringBootTest(
     classes = TripBookingServiceTemporalApplication.class,
@@ -160,15 +162,16 @@ public class TripBookingTemporalWorkflowIntegrationTest {
         });
         
         // Wait for flight signal to be processed
-        Thread.sleep(1000);
-        
-        // Verify flight booking is confirmed
-        WorkflowState stateAfterFlight = workflow.getWorkflowState();
-        assertThat(stateAfterFlight.isFlightBooked()).isTrue();
-        assertThat(stateAfterFlight.getFlightConfirmation()).isEqualTo("AA100");
-        assertThat(stateAfterFlight.isHotelReserved()).isFalse();
-        assertThat(stateAfterFlight.isCarRented()).isFalse();
-        
+        await().atMost(Duration.ofSeconds(5))
+                .untilAsserted(() -> {
+                    // Verify flight booking is confirmed
+                    WorkflowState stateAfterFlight = workflow.getWorkflowState();
+                    assertThat(stateAfterFlight.isFlightBooked()).isTrue();
+                    assertThat(stateAfterFlight.getFlightConfirmation()).isEqualTo("AA100");
+                    assertThat(stateAfterFlight.isHotelReserved()).isFalse();
+                    assertThat(stateAfterFlight.isCarRented()).isFalse();
+                });
+
         // Act as mock hotel service
         hotelCommandSubscription.assertRecordReceived(record -> {
             ReserveHotelCommand command = record.value();
@@ -188,18 +191,19 @@ public class TripBookingTemporalWorkflowIntegrationTest {
             kafkaTemplate.send("hotel-reserved-reply", correlationId.toString(), reply);
             kafkaTemplate.flush();
         });
+
+        await().atMost(Duration.ofSeconds(5))
+                .untilAsserted(() -> {
         
-        // Wait for hotel signal to be processed
-        Thread.sleep(1000);
-        
-        // Verify hotel booking is confirmed
-        WorkflowState stateAfterHotel = workflow.getWorkflowState();
-        assertThat(stateAfterHotel.isFlightBooked()).isTrue();
-        assertThat(stateAfterHotel.getFlightConfirmation()).isEqualTo("AA100");
-        assertThat(stateAfterHotel.isHotelReserved()).isTrue();
-        assertThat(stateAfterHotel.getHotelConfirmation()).isEqualTo("HTL-789");
-        assertThat(stateAfterHotel.isCarRented()).isFalse();
-        
+            WorkflowState stateAfterHotel = workflow.getWorkflowState();
+            assertThat(stateAfterHotel.isFlightBooked()).isTrue();
+            assertThat(stateAfterHotel.getFlightConfirmation()).isEqualTo("AA100");
+            assertThat(stateAfterHotel.isHotelReserved()).isTrue();
+            assertThat(stateAfterHotel.getHotelConfirmation()).isEqualTo("HTL-789");
+            assertThat(stateAfterHotel.isCarRented()).isFalse();
+        });
+
+
         // Act as mock car rental service
         carCommandSubscription.assertRecordReceived(record -> {
             RentCarCommand command = record.value();
@@ -219,17 +223,17 @@ public class TripBookingTemporalWorkflowIntegrationTest {
             kafkaTemplate.send("car-rented-reply", correlationId.toString(), reply);
             kafkaTemplate.flush();
         });
-        
-        // Wait for car rental signal to be processed
-        Thread.sleep(1000);
-        
-        // Verify final state - all bookings confirmed
-        WorkflowState finalState = workflow.getWorkflowState();
-        assertThat(finalState.isFlightBooked()).isTrue();
-        assertThat(finalState.getFlightConfirmation()).isEqualTo("AA100");
-        assertThat(finalState.isHotelReserved()).isTrue();
-        assertThat(finalState.getHotelConfirmation()).isEqualTo("HTL-789");
-        assertThat(finalState.isCarRented()).isTrue();
-        assertThat(finalState.getCarConfirmation()).isEqualTo("CAR-012");
+
+        await().atMost(Duration.ofSeconds(5))
+                .untilAsserted(() -> {
+            WorkflowState finalState = workflow.getWorkflowState();
+            assertThat(finalState.isFlightBooked()).isTrue();
+            assertThat(finalState.getFlightConfirmation()).isEqualTo("AA100");
+            assertThat(finalState.isHotelReserved()).isTrue();
+            assertThat(finalState.getHotelConfirmation()).isEqualTo("HTL-789");
+            assertThat(finalState.isCarRented()).isTrue();
+            assertThat(finalState.getCarConfirmation()).isEqualTo("CAR-012");
+        });
+
     }
 }

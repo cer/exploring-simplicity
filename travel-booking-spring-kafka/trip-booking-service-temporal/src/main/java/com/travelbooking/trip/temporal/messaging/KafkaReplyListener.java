@@ -1,7 +1,6 @@
 package com.travelbooking.trip.temporal.messaging;
 
 import com.travelbooking.trip.temporal.domain.CarRentedReply;
-import com.travelbooking.trip.temporal.domain.FlightBookedReply;
 import com.travelbooking.trip.temporal.domain.HotelReservedReply;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowStub;
@@ -12,31 +11,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class KafkaReplyListener {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(KafkaReplyListener.class);
-    
+
     private final WorkflowClient workflowClient;
-    
+
     public KafkaReplyListener(WorkflowClient workflowClient) {
         this.workflowClient = workflowClient;
-    }
-    
-    @KafkaListener(topics = "flight-booked-reply", groupId = "trip-booking-temporal-group")
-    public void handleFlightBookedReply(FlightBookedReply reply) {
-        logger.info("Received flight booking reply for correlation ID: {}", reply.correlationId());
-        
-        try {
-            // Get the workflow stub using the correlation ID as workflow ID
-            WorkflowStub workflowStub = workflowClient.newUntypedWorkflowStub(reply.correlationId().toString());
-            
-            // Signal the workflow
-            workflowStub.signal("flightBooked", reply);
-            
-            logger.info("Signaled workflow {} with flight booking confirmation: {}", 
-                reply.correlationId(), reply.confirmationNumber());
-        } catch (Exception e) {
-            logger.error("Error signaling workflow for flight booking reply", e);
-        }
     }
     
     @KafkaListener(topics = "hotel-reserved-reply", groupId = "trip-booking-temporal-group")
