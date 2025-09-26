@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.List;
 
-public record TestSubscription<K, V>(Consumer<K, V> consumer, String topic) {
+public record TestSubscription<K, V>(Consumer<K, V> consumer, String topic) implements AutoCloseable {
   
   private static final Logger logger = LoggerFactory.getLogger(TestSubscription.class);
 

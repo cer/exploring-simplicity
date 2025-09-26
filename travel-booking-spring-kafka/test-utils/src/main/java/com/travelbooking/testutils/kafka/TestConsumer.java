@@ -34,54 +34,42 @@ public class TestConsumer {
   public <K, V> TestSubscription<K, V> subscribe(String topic, Deserializer<K> keyDeserializer,
                                                  @Nullable Deserializer<V> valueDeserializer) {
     String uniqueGroupId = "test-group-" + UUID.randomUUID();
-    Map<String, Object> consumerProps;
-    
-    if (bootstrapServers != null) {
-      // Using KafkaContainer or external Kafka
-      consumerProps = new java.util.HashMap<>();
-      consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-      consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, uniqueGroupId);
-      consumerProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
-      consumerProps.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "10");
-    } else if (embeddedKafkaBroker != null) {
-      // Using EmbeddedKafkaBroker  
-      consumerProps = KafkaTestUtils.consumerProps(uniqueGroupId, "true", embeddedKafkaBroker);
-    } else {
-      throw new IllegalStateException("Neither bootstrapServers nor embeddedKafkaBroker is configured");
-    }
-    
-    consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-    consumerProps.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 10);
+    Map<String, Object> consumerProps = makeConsumerProps(uniqueGroupId);
+
     var consumer = new DefaultKafkaConsumerFactory<>(consumerProps, keyDeserializer, valueDeserializer)
         .createConsumer();
     consumer.subscribe(Collections.singletonList(topic));
     return new TestSubscription<>(consumer, topic);
   }
 
-  public TestSubscription<String, String> subscribe(String topic) {
+    private Map<String, Object> makeConsumerProps(String uniqueGroupId) {
+        Map<String, Object> consumerProps;
+        if (bootstrapServers != null) {
+          // Using KafkaContainer or external Kafka
+          consumerProps = new java.util.HashMap<>();
+          consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+          consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, uniqueGroupId);
+          consumerProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
+          consumerProps.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "10");
+        } else if (embeddedKafkaBroker != null) {
+          // Using EmbeddedKafkaBroker
+          consumerProps = KafkaTestUtils.consumerProps(uniqueGroupId, "true", embeddedKafkaBroker);
+        } else {
+          throw new IllegalStateException("Neither bootstrapServers nor embeddedKafkaBroker is configured");
+        }
+        consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        consumerProps.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 10);
+        return consumerProps;
+    }
+
+    public TestSubscription<String, String> subscribe(String topic) {
     return subscribe(topic, new StringDeserializer(),new StringDeserializer());
   }
 
   public <V> TestSubscription<String, V> subscribeForJSon(String topic, Class<V> messageClass) {
     String uniqueGroupId = "test-group-" + UUID.randomUUID();
-    Map<String, Object> consumerProps;
-    
-    if (bootstrapServers != null) {
-      // Using KafkaContainer or external Kafka
-      consumerProps = new java.util.HashMap<>();
-      consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-      consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, uniqueGroupId);
-      consumerProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
-      consumerProps.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "10");
-    } else if (embeddedKafkaBroker != null) {
-      // Using EmbeddedKafkaBroker
-      consumerProps = KafkaTestUtils.consumerProps(uniqueGroupId, "true", embeddedKafkaBroker);
-    } else {
-      throw new IllegalStateException("Neither bootstrapServers nor embeddedKafkaBroker is configured");
-    }
-    
-    consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-    consumerProps.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 10);
+    Map<String, Object> consumerProps = makeConsumerProps(uniqueGroupId);
+
     consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "com.travelbooking.*");
     consumerProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, messageClass);
 
